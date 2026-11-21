@@ -1,7 +1,7 @@
 {
   "company": "Engineering Team Sync",
   "slug": "engineering-team-sync",
-  "last_etl_date": "2026-11-14T07:10:06.545178",
+  "last_etl_date": "2026-11-21T07:50:19.799981",
   "calls": [
     {
       "id": "01KGT5917ZP7J7SSP08X1N1ZW3",
@@ -237,6 +237,17 @@
       "summary": "# Engineering Team Sync\nDate: 2026-11-13 | Duration: 68m\n\n## Summary\nThe discussion covered mixed adoption of Fable 5.2, with Fable favored for heavier analysis and Opus 5.5 preferred for faster everyday work; Fable resets expire December 10. Growthbook may adopt weekly patch releases for security and small fixes, while version 5.2.1 was planned for early the following week with support monitoring branch-specific issues. QA overrides were demonstrated for draft experiments and will disappear when experiments launch, replacing a prior SDK workaround. Fact-table details now include query editing, charts, filters, samples, event associations, metrics, refresh controls, and cached values, though expanded-row and tab styling need refinement. Population creation supports one-step definitions and denominator metrics in Metrics Explorer, while feature-flag targeting remains future work. The homepage redesign aims to support work starting through needs-attention items, recent activity, learning content, documentation, and dashboards, but its information architecture and personalization require validation. Multiple event forwarders are being restored with environment-specific ownership, while the free tier remains capped at 1 million events per month.\n\n## Keywords\nFable 5.2, Patch releases, QA overrides, Fact tables, Population metrics, Homepage redesign, Event Forwarder\n\n## Action Items\n**Adriel Vieira**\nCut release 5.2.1 (12:18)\n\n**Kevin**\nCut release 5.2.1 (12:18)\n\n**Gabe Melean**\nAdd notification to start-experiment dialog (18:57)\n\n**Nobu Ajito**\nFix expanded-row alignment (31:26)\n\n**Johnny Martinez**\nReview homepage concept (41:16)\n\n**Jeremy Dorn**\nPresent product/demo application (54:48)",
       "organizer": "michael@growthbook.io",
       "participants": 29,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7X5AN65V5XS1QMNE0TRWFXJ",
+      "source": "fireflies",
+      "title": "Engineering Team Sync",
+      "date": "2026-11-20",
+      "duration_minutes": 1,
+      "summary": "# Engineering Team Sync\nDate: 2026-11-20 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "johnny@growthbook.io",
+      "participants": 28,
       "summary_quality": "good"
     }
   ]

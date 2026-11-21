@@ -1,7 +1,7 @@
 {
   "company": "Zoro + GrowthBook",
   "slug": "zoro-growthbook",
-  "last_etl_date": "2026-10-23T05:34:42.362314",
+  "last_etl_date": "2026-11-21T07:50:19.800750",
   "calls": [
     {
       "id": "01KVXF4DB3N44ZB5WM8AJ453WB",
@@ -148,6 +148,17 @@
       "summary": "# Zoro + GrowthBook\nDate: 2026-10-22 | Duration: 15.239999771118164m\n\n## Summary\nThe POC is scheduled to end tomorrow, with most required work completed and no major unresolved concerns. Main-branch code references are working, although Logan Bates is checking the status of a remaining UI issue. Audience-based breakdowns were validated, and the audience requirement is ready to check off. The PDP production A/B test was completed, with a comprehensive report receiving positive feedback from Donald, the product manager. Metric-slice work advanced through subgroup creation, broader value handling, and a fix for a segmentation-related issue, with a PR targeting the next cloud deployment. Broader Datadog production-support work, including webhook testing, canary releases, and automated rollback, was scoped outside the POC; three unchecked requirements remain tied to Datadog performance functionality. The customer intends to move forward with GrowthBook, while contract details remain open. Christian Liebenow will share roadmap and SLA slides, continue Datadog discussions with Logan and Jeremy, add people to Slack, and support account-manager and architect introductions.\n\n## Keywords\nDatadog integration, Automated rollback, Production A/B testing, Metric slices, Code references, Contract negotiations\n\n## Action Items\n**Logan Bates**\nCheck UI bug status (04:45)\n\n**Christian Liebenow**\nDiscuss native Datadog integration (08:17)\nShare roadmap and SLA materials (12:23)\nAdd GrowthBook contacts (13:57)\nSet up follow-up call (13:57)",
       "organizer": "christian@growthbook.io",
       "participants": 16,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7WW0KGBM5T8XMY831D1D9GV",
+      "source": "fireflies",
+      "title": "Zoro + GrowthBook",
+      "date": "2026-11-20",
+      "duration_minutes": 28.709999084472656,
+      "summary": "# Zoro + GrowthBook\nDate: 2026-11-20 | Duration: 28.709999084472656m\n\n## Summary\nAnalytics blocking was isolated to initialization order, and Victor’s team removed the POC code; marketing analytics is expected to resume after the next release. GrowthBook initialization may still be slow or fail, so Init Sync is preferred, while CI-baked payloads, stable snapshots, or proxy-served payloads were considered. Zoro expects to use the proxy approach, which Victor will validate. Technical access was extended through November 30 for up to 25 seats to support evaluation. Commercial discussions focused on preserving negotiated pricing: a $125k platform-fee baseline, a 5% renewal cap, and read-only pricing of $75 per user for 100–199 users and $50 for 200-plus users. Full-user pricing remains under review. Christian and Jay are revising the order form, while Kim’s MSA work remains the main dependency; completion by the end of November is uncertain.\n\n## Keywords\nGrowthBook initialization, GTM analytics, Proxy implementation, Feature flags, Pricing cap, Contract negotiation\n\n## Action Items\n**Bryce Fitzsimons**\n- Review GrowthBook documentation and examples (05:57)\n\n**Victor Zhagui**\n- Connect with Jay Shell Larson (13:09)\n- Investigate proxy-based GrowthBook implementation (13:19)\n- Send technical follow-up questions to Bryce (13:19)\n\n**Christian Liebenow**\n- Verify full-user pricing (21:08)\n- Send revised pricing language to GrowthBook legal team (22:48)\n- Send revised order-form language to Kim (23:05)",
+      "organizer": "christian@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

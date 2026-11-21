@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> HealthEquity",
+  "slug": "growthbook-healthequity",
+  "last_etl_date": "2026-11-21T07:50:19.788522",
+  "calls": [
+    {
+      "id": "01M6YCWT5CEW2D2B2D2HP72KQS",
+      "source": "fireflies",
+      "title": "Growthbook <> HealthEquity - Intro/Demo",
+      "date": "2026-11-20",
+      "duration_minutes": 26.18000030517578,
+      "summary": "# Growthbook <> HealthEquity - Intro/Demo\nDate: 2026-11-20 | Duration: 26.18000030517578m\n\n## Summary\nGrowthBook was presented as a warehouse-native experimentation platform with more than six years in the experimentation space, adoption across health tech, fintech, AI, and consumer businesses, and support for over 3,300 enterprise organizations. Its capabilities include SDK-based front-end, back-end, and mobile testing; randomized user splits; feature releases; self-hosting; managed deployment; warehouse-based metrics; analytics dashboards; and centralized learning from historical experiments. Planned integrations with Claude, Codex, and similar AI tools could support test creation, deployment, measurement, and result sharing. HealthEquity already has an internally developed experimentation program, expanded its data platform with Amplitude, and implemented feature flagging around Q3 of the current year. Regulatory review requirements for money movement, identity, and AML-related workflows make near-term replacement unlikely, although less regulated areas may offer more flexibility. Manash identified healthcare and commerce startups, particularly those without established analytics or feature-flagging tools, as stronger prospects and planned to review a startup’s technology stack after Thanksgiving before considering an introduction.\n\n## Keywords\nExperimentation, Feature flagging, Warehouse-native analytics, Amplitude, Health technology, AI-assisted development\n\n## Action Items\n**Manash Bhattacharjee**\nConnect GrowthBook with HealthEquity contacts (05:08)\nReview startup technology stack (24:16)\nIntroduce GrowthBook to startup founder (24:16)",
+      "organizer": "dan@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

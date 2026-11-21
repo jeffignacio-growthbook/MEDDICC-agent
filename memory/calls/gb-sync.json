@@ -1,0 +1,18 @@
+{
+  "company": "GB sync",
+  "slug": "gb-sync",
+  "last_etl_date": "2026-11-21T07:50:19.801613",
+  "calls": [
+    {
+      "id": "01M7SWJR9VCX10VDYAD05FCM7A",
+      "source": "fireflies",
+      "title": "GB sync",
+      "date": "2026-11-20",
+      "duration_minutes": 36.349998474121094,
+      "summary": "# GB sync\nDate: 2026-11-20 | Duration: 36.349998474121094m\n\n## Summary\nThe team agreed to retain weekly meetings, add attendees as needed, and bring Luke or another engineer into future calls to reduce technical back-and-forth. Cross-team alignment remains difficult because three or four teams have competing priorities during a peak workload period. Data plans include reconciling the existing Adobe pipeline with a direct Tealium-Snowflake path before switching, while verifying the established S3-to-Snowflake flow and Athena integration. Shaaz will share the architecture, and Rémy will correct the pipeline diagram. Checkout instrumentation is paused for this week and next week because the front-end team is unavailable; offline testing can use historical experiments and GrowthBook results. DPO guidance is still needed on consent and whether experiment-only data can use an essential-cookie treatment. Non-production work will begin in the acceptance environment after the front-end team returns, with launch timing uncertain around the last order day near December 15, the holidays, or early January. The team also discussed a low-risk AA test, flicker controls, experiment dimensions, fact-table joins, and unresolved order-versus-line-item data grain.\n\n## Keywords\nGrowthBook, Tealium, Adobe Analytics, Snowflake, Experiment instrumentation, Consent management\n\n## Action Items\n**Rémy Marin**\nVerify GrowthBook integration support (07:44)\nShare instrumentation HTML artefact (13:28)\nRework pipeline diagram (15:18)\nVerify fact-table joins (33:36)\nReview fact-table structure (34:17)\n\n**Shaaz Adiraja**\nConsult Data Protection Officer (13:28)\nConfirm Adobe–Tealium data flow (14:58)\nShare pipeline documents (18:13)\nBring engineer into discussions (18:52)\nCoordinate SDK integration teams (21:40)\nSummarise discussion and gather feedback (27:25)\nAdd Rémy as administrator (27:48)",
+      "organizer": "remy@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

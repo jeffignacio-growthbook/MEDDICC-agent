@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Entitlements Pricing",
+  "slug": "growthbook-entitlements-pricing",
+  "last_etl_date": "2026-11-21T07:50:19.801439",
+  "calls": [
+    {
+      "id": "01M7WS8NP1SPD4B4HRZKFYGH7B",
+      "source": "fireflies",
+      "title": "GrowthBook Entitlements Pricing and Security Review",
+      "date": "2026-11-20",
+      "duration_minutes": 27.020000457763672,
+      "summary": "# GrowthBook Entitlements Pricing and Security Review\nDate: 2026-11-20 | Duration: 27.020000457763672m\n\n## Summary\nFuel Finance uses self-hosted GrowthBook for development flags and client entitlements rather than A/B testing, with current functionality covering roughly 75% of its needs. Feature flags and targeting rules support client-specific access, trials, and tier previews, but sales-friendly Bronze or Gold controls would require an admin panel, CRM integration, or API-based group updates. Fuel Finance has already built an internal wrapper and entitlement system, reducing the value of enterprise functionality. The main unresolved issue is security: one shared API key can affect flags across environments, so environment-specific permissions are unavailable. A proxy or additional server layer could shield production credentials, with Oleg estimating roughly $3k for implementation and an annual ceiling of approximately $12k. GrowthBook enterprise self-hosting was discussed at $175k annually, with a proposed discount reducing the next-year cost to $50k, but this remained outside Fuel Finance’s budget. Christian planned to reassess pricing, while Oleg planned to validate the internal security approach.\n\n## Keywords\nFeature entitlements, API-key security, Self-hosted Enterprise, Environment isolation, Controlled customer pilots, Pricing negotiation\n\n## Action Items\n**Christian Liebenow**\nRevisit Fuel Finance use case (23:35)\nSend follow-up email (25:09)\n\n**Oleg Lozynskyi**\nEvaluate token protection approach (24:28)",
+      "organizer": "christian@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "Metyis/Gandi & GrowthBook",
+  "slug": "metyis-gandi-growthbook",
+  "last_etl_date": "2026-11-21T07:50:19.801535",
+  "calls": [
+    {
+      "id": "01M7Q6XAAPNESNJJNYWFH94A2H",
+      "source": "fireflies",
+      "title": "Metyis/Gandi & GrowthBook  | Introduction Call",
+      "date": "2026-11-20",
+      "duration_minutes": 33.29999923706055,
+      "summary": "# Metyis/Gandi & GrowthBook  | Introduction Call\nDate: 2026-11-20 | Duration: 33.29999923706055m\n\n## Summary\nGandi is planning experiments for its shop, billing, product improvements, and acquisition channels, supported by Metyis consultants Charlotte and Ivan during a two-month engagement. Implementation planning for the 2027 experimentation roadmap is underway, with cookie availability requiring different approaches across Astro on gandi.com, Node.js for the shop, and Wagtail Django on gandi.net. The setup requires SDKs, feature flags, exposure callbacks, visitor assignment, and integration with Gandi’s analytics pipeline. GrowthBook can use read-only warehouse access and existing BI data, but identity linking, anonymous-to-account continuity, join-table design, and production performance require further consideration. GDPR options include EU-hosted ClickHouse and self-hosting, with deletion controls under review. Feature releases, audience targeting, open-source auditability, frequentist and Bayesian analysis, and latency monitoring were discussed. Next steps include documentation review, a DevOps-focused technical deep dive, legal and security review, and indicative pricing based on user seats.\n\n## Keywords\nGrowthBook, A/B testing, Feature flags, Cookie-free experimentation, Data warehouse, GDPR compliance\n\n## Action Items\n**Rémy Marin**\nSend SDK documentation (14:17)\nSend identity-linking documentation (19:19)\nDemonstrate identity-linking workflow (22:15)\n\n**Marcel Geldner**\nSend meeting summary (24:24)\nSend Trust Center materials (24:24)\nSend data-processing documentation (27:17)\nProvide indicative pricing (28:33)\nSend customer overview deck (31:01)\n\n**Mikael L**\nReview implementation documentation (25:50)\nReview analytics models (28:42)\n\n**Charlotte van Vliet**\nCoordinate technical follow-up (31:23)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "[CR] Weekly Marcel/Creatistas",
+  "slug": "cr-weekly-marcel-creatistas",
+  "last_etl_date": "2026-11-21T07:50:19.801692",
+  "calls": [
+    {
+      "id": "01M7Q96CQ4J8TVK8858TBPKJVY",
+      "source": "fireflies",
+      "title": "[CR] Weekly Marcel/Creatistas",
+      "date": "2026-11-20",
+      "duration_minutes": 22.049999237060547,
+      "summary": "# [CR] Weekly Marcel/Creatistas\nDate: 2026-11-20 | Duration: 22.049999237060547m\n\n## Summary\nNo summary available",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

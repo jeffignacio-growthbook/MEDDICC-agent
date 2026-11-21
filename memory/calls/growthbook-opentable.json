@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> OpenTable",
+  "company": "Growthbook <> Opentable",
   "slug": "growthbook-opentable",
-  "last_etl_date": "2026-11-14T07:10:06.546869",
+  "last_etl_date": "2026-11-21T07:50:19.787963",
   "calls": [
     {
       "id": "69de6935c1f9eb0011fa27dc",
@@ -214,6 +214,17 @@
       "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-11-13 | Duration: 41.70000076293945m\n\n## Summary\nGrowthBook results were nearly identical to the internal tool, with most differences limited to 0.01–0.02 percentage points. The cancellation discrepancy was resolved after Rahul matched the internal booking-based ratio definition. The POC is progressing positively, though it may extend beyond the original end-of-November target, with success depending on GrowthBook being as easy or easier to use while adding capabilities. Remaining validation covers dashboards, power calculations, traffic splits, holdouts, platform targeting, and backend tracking. The team prefers one project with separate development and production data sources to prevent incorrect tracking, while environment-level data-source support remains a product gap. QA overrides, experiment templates, metadata retrieval, and platform behavior also require review. Several hundred internal metrics may create dashboard noise. Commercial approval is affected by the CTO transition, and read-access pricing remains the main concern. Dan proposed a 15-minute discussion next week and a technical working session for Rahul and Saranya.\n\n## Keywords\nA/B testing, GrowthBook, Feature flags, Environment isolation, Dashboarding, Seat pricing\n\n## Action Items\n**Logan Bates**\nConfirm GrowthBook QA overrides (11:10)\nShare environment-specific data source request (16:28)\nRaise environment template request (24:16)\nReview experiment metadata support (22:59)\n\n**Rahul Bhatia**\nReview dashboarding and calculator workflows (27:06)\nValidate platform targeting (30:47)\nVerify frontend platform metadata usage (35:41)\n\n**Saranya HV**\nReview dashboarding and calculator workflows (27:06)\nRun platform targeting parity test (29:18)\nParticipate in GrowthBook working session (37:07)\n\n**Forrest Rice**\nDiscuss commercial structure (38:54)\nConfirm seat pricing concerns (39:40)\n\n**Dan Wathne**\nReview remaining POC gaps (36:18)\nPropose revised seat structure (38:54)\nPrepare order form (38:54)",
       "organizer": "dan@growthbook.io",
       "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7S06EAS5B6KYG0V8SXW1TKM",
+      "source": "fireflies",
+      "title": "Growthbook <> Opentable - Pricing Sync",
+      "date": "2026-11-20",
+      "duration_minutes": 21.600000381469727,
+      "summary": "# Growthbook <> Opentable - Pricing Sync\nDate: 2026-11-20 | Duration: 21.600000381469727m\n\n## Summary\nThe discussion focused on shaping a commercial agreement and completing contracting. The preferred structure is 100 full seats in year one, with an option to upgrade early, followed by 200 full seats in year two; blended pricing and comparable one-year economics will also be considered. Floating read-only access was accepted, but broader occasional access remains the main commercial concern because sales users and other employees may need to view experiment results. The customer wants to avoid building an API-based experiment dashboard. Adoption sizing is unresolved: the organization includes approximately 150 engineers and 20–30 project managers and designers, but not all potential users are expected to need full access immediately. The platform fee remains separate from usage scaling, with seats serving as the scaling metric. Legal review of the MSA and related materials is substantially complete, leaving the order form as the main contracting step. A revised proposal is expected for review in the first week of December, the trial continues through the second week, and both sides aim to complete the partnership before year-end.\n\n## Keywords\nRead-only seats, Two-year contract, Seat-based pricing, Trial extension, Order form, Experimentation adoption\n\n## Action Items\n**Dan Wathne**\nBegin order-form process (16:29)\nCoordinate final joint call (18:15)\nPrepare commercial proposal (20:06)\n\n**Forrest Rice**\nReview GrowthBook proposal (17:18)",
+      "organizer": "dan@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]

@@ -1,7 +1,7 @@
 {
-  "company": "GrowthBook <> Talbots",
+  "company": "Growthbook <> Talbots",
   "slug": "growthbook-talbots",
-  "last_etl_date": "2026-11-05T07:32:46.022844",
+  "last_etl_date": "2026-11-21T07:50:19.801256",
   "calls": [
     {
       "id": "01M69PZQWXPJ3CA0G7NTQKPTQ7",
@@ -23,6 +23,17 @@
       "summary": "# GrowthBook <> Talbots - Demo\nDate: 2026-11-04 | Duration: 67.7699966430664m\n\n## Summary\nLeadership is exploring an Adobe exit, while the contract timeline remains unknown and may range from one to three years. GrowthBook was presented as a warehouse-native experimentation platform operating directly with Snowflake, with feature flagging and experimentation as its core focus. It supports production hotfixes, audience targeting, configurable rollouts, automatic rollback, QA, approvals, audit history, and role-based access. Existing Tealium data flows into Snowflake, while SDK attributes and exposure tracking appear compatible with the expected implementation. Namespaces, deterministic bucketing, and holdouts help prevent overlapping tests, preserve assignments, and maintain control populations. Reporting can use warehouse metrics, Bayesian comparisons, and funnel analysis. Jira and Microsoft Teams requirements still need validation. The holiday code freeze prevents live integration until January, although dummy-data evaluation remains possible. Next steps include confirming Adobe timing, involving analytics and product stakeholders, and potentially running a two-week trial.\n\n## Keywords\nGrowthBook, Feature flags, Warehouse-native experimentation, Snowflake, Experiment namespaces, Visual editor\n\n## Action Items\n**Logan Bates**\nSend Talbots demonstration video (24:26)\nTest visual editor compatibility (50:39)\n\n**Adam Goodrich**\nTest feature-flag workflows (58:41)\nValidate SDK integration (01:04:44)\n\n**Dan Wathne**\nDevelop pricing estimate (01:00:11)\nArrange follow-up demonstration (01:00:41)\nPrepare trial environment (01:00:41)\n\n**Phil Studley**\nCoordinate stakeholder participation (01:00:41)\nDiscuss evaluation internally (01:02:22)\nDetermine Adobe contract end date (01:03:31)",
       "organizer": "dan@growthbook.io",
       "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7QW4MGN6H1CPA5CTDNDP1CF",
+      "source": "fireflies",
+      "title": "Growthbook <> Talbots - Pricing Sync",
+      "date": "2026-11-20",
+      "duration_minutes": 11.899999618530273,
+      "summary": "# Growthbook <> Talbots - Pricing Sync\nDate: 2026-11-20 | Duration: 11.899999618530273m\n\n## Summary\nThe discussion covered an ongoing exploration of Adobe Target renewal, which is expected in 2027, while leadership favors moving away from Adobe because of testing caps, unused connector spend, traffic-change restarts, and clunky experimentation workflows. GrowthBook was positioned as an enterprise platform for broader experimentation, with advanced features, dedicated account management, quarterly reviews, and private Slack or Microsoft Teams access to support engineers. Commercial estimates included approximately 24k in platform fees and around 89,000 annually for roughly 200 experiments, while a 400-experiment option was described at approximately 134 annually; pricing depends on volume, and migration could reset first-year volume. Open issues include identifying the Adobe contract owner, determining current Adobe Target spend, establishing an internal budget, and assessing migration volume. A code freeze limits near-term evaluation, so deeper work may occur afterward and in the new year. Dan will send Phil a proposal deck, and an early-December touchpoint was proposed.\n\n## Keywords\nAdobe Target, GrowthBook, Experimentation, Pricing, Code freeze, Enterprise support\n\n## Action Items\n**Phil Studley**\n- Identify Talbots Adobe Target contract owner (01:27)\n- Confirm Talbots Adobe Target spend (08:25)\n\n**Dan Wathne**\n- Email Phil GrowthBook proposal deck (09:42)\n- Reconnect in early December (09:42)",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

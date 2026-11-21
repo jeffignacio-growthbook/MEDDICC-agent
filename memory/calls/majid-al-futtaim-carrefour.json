@@ -1,0 +1,18 @@
+{
+  "company": "Majid Al Futtaim/Carrefour",
+  "slug": "majid-al-futtaim-carrefour",
+  "last_etl_date": "2026-11-21T07:50:19.801755",
+  "calls": [
+    {
+      "id": "01M7SQJJ9T86WKNT96W040QAJF",
+      "source": "fireflies",
+      "title": "Majid Al Futtaim/Carrefour & GrowthBook | Platform Walkthrough",
+      "date": "2026-11-20",
+      "duration_minutes": 48.540000915527344,
+      "summary": "# Majid Al Futtaim/Carrefour & GrowthBook | Platform Walkthrough\nDate: 2026-11-20 | Duration: 48.540000915527344m\n\n## Summary\nThe discussion focused on expanding experimentation with GrowthBook, which is currently managed by Engineering without a formal process and with limited creative testing. The Growth team wants creator and editor access to reduce administrative dependency, while the app remains the priority because it generates over 90% of revenue. The target is 25–30 experiments annually, beginning with three users. Enterprise capabilities discussed included the Visual Editor for no-code copy and layout testing, templates for standardized workflows, expanded AI usage, and safe rollouts with approval workflows and automatic kill switches. Training, team support, APAC coverage, and possible agency assistance were requested, with regional coverage preferred. Competitors including Optimizely and Wingify were evaluated, with disclosed three-year totals of €400,000–€650,000. GrowthBook’s single-license, non-usage-based pricing was viewed as relevant. VP approval is pending, and leadership materials must compare Community and Enterprise options. GrowthBook is expected to provide a three-user quote and supporting materials before the Wednesday follow-up.\n\n## Keywords\nGrowthBook Enterprise, Visual Editor, A/B testing, Safe rollout, Experimentation programme, Agency support\n\n## Action Items\n**Tom Kassis and Sakshi**\nAnswer follow-up questions (04:41)\n\n**James Shannon**\nSend Enterprise quotation (39:09)\nContact agency partners (39:44)\nArrange agency meeting (39:44)\nSchedule Wednesday meeting (42:35)\nPrepare Enterprise comparison (46:18)\n\n**Rémy Marin**\nSend demonstration video (42:47)\nSend role information (42:47)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

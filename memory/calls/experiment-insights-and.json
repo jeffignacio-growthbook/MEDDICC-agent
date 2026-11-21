@@ -1,0 +1,18 @@
+{
+  "company": "Experiment Insights and",
+  "slug": "experiment-insights-and",
+  "last_etl_date": "2026-11-21T07:50:19.799440",
+  "calls": [
+    {
+      "id": "01M7X5RTNHP0QAYW920DW355RG",
+      "source": "fireflies",
+      "title": "Experiment Insights and Statistical Safeguards",
+      "date": "2026-11-20",
+      "duration_minutes": 36.29999923706055,
+      "summary": "# Experiment Insights and Statistical Safeguards\nDate: 2026-11-20 | Duration: 36.29999923706055m\n\n## Summary\nPlans for results surfacing focus on punchier experiment summaries and highlights that replace dashboard-first viewing, with goal metrics included and secondary results filtered. Statistical safeguards remain central: multiple-comparison concerns, stricter surfacing rules, and strict thresholds for surprising slices, negative subgroup effects, and lower-credibility outliers. A Signals page is likely to ship first, using pre-specified dimensions and ranked findings; precomputed dimensions limit coverage, while configurable setup and existing dashboards provide fallback options. API advisories are proposed for agent consumption, with severity, plain-text messages, and supporting data paths. Interpretation rules currently encoded in skills may move server-side into centralized heuristic or LLM-based logic; hypermedia links for next steps were discussed but applicability is unconfirmed. Product work includes a live experiment redesign with inline editing and improved flag management, feature flags in A/B testing, a review publishing redesign led by Gaia, and governance controls for SDK connections, including revisions, rollback, and webhook versioning. Source: Results Surfacing, API Advisories, Statistical Interpretation, and Product UI Redesign.\n\n## Keywords\nExperiment summarisation, Signals, Advisories API, Statistical safeguards, Feature-flag redesign, SDK governance\n\n## Action Items\n**Johnny Martinez**\nDefine dimensions handling (08:35)\n\n**Adriel Vieira**\nDefine Advisories schema (13:26)\n\n**Luke Sonnet**\nImplement advisory pattern (25:15)\n\n**Bryce Fitzsimons**\nComplete Feature Flags A/B test (32:02)\nAssess Feature Flags results (32:02)\nRoll out Feature Flags redesign (32:02)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

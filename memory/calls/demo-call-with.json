@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-11-20T07:53:33.050192",
+  "last_etl_date": "2026-11-21T07:50:19.797158",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1313,6 +1313,28 @@
       "summary": "# Demo Call with Tom Kassis from Majid Al Futtaim\nDate: 2026-11-19 | Duration: 40m\n\n## Summary\nCarrefour Middle East is evaluating GrowthBook Enterprise, initially for app experimentation in the UAE, with possible expansion across other Middle East countries and selected African markets. Carrefour currently uses the community version through its developers, technology teams, and Digital Hub, but engineers still configure experiments, manage metadata, and provide results, limiting business-user autonomy. The target is at least two A/B tests per month focused on average basket value, checkout performance, page visits, product-ad visibility, and audience targeting. Carrefour requires non-technical experiment management, role-based permissions, maker-checker approvals, templates, SSO, and reliable metrics integration with Google Analytics and its broader data stack. Pricing was described as an enterprise platform fee plus user seats, without traffic-based pricing or experiment-volume caps; initial access may involve approximately 5–10 users. Carrefour is comparing competitors, has not defined a budget, and wants partner-led support covering experimentation processes and outcome interpretation. Tom will send 15 priority experiments, while GrowthBook will provide enterprise materials, quotation context, and legal documents, with evaluation targeted for completion within approximately one to two weeks.\n\n## Keywords\nA/B testing, GrowthBook Enterprise, Experimentation culture, Mobile app optimisation, Role-based access, Data warehouse integration\n\n## Action Items\n**Tom Kassis**\nSend priority list (14:45)\nConfirm data warehouse and technical stack (25:03)\n\n**Marcel Geldner**\nSend portfolio and presentation materials (15:54)\nSend Enterprise proposal materials (25:49)\nSend data processing addendum and customer agreement (29:44)\nSend follow-up meeting invitation (29:50)\n\n**Rémy Marin**\nSend role and permissions documentation (18:19)\nSend technical follow-up questions (25:03)\nPrepare Enterprise and Community comparison materials (25:18)\n\n**Sakshi**\nConfirm data warehouse and technical stack (25:03)",
       "organizer": "james.shannon@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7X6TFMP6WQWTB5RCSJR0491",
+      "source": "fireflies",
+      "title": "Demo Call with Pawanjit Singh from Freedom Mortgage",
+      "date": "2026-11-20",
+      "duration_minutes": 37,
+      "summary": "# Demo Call with Pawanjit Singh from Freedom Mortgage\nDate: 2026-11-20 | Duration: 37m\n\n## Summary\nFreedom Mortgage needs a centralized enterprise feature-flag platform so teams such as Crosspoint, Wholesale, and Call Center can release completed features independently while keeping them disabled until APIs, platform changes, or data-model dependencies are ready. The platform should provide targeting, visibility, consistency, audit logs, approvals, lifecycle management, and stale-flag cleanup. Application flagging is the immediate priority, while agent experimentation is a longer-term requirement connected to internal post-loan-closing workflows and a broader digital-workforce vision planned for 2027. GrowthBook was presented as an experimentation layer for flags, with Snowflake compatibility, local SDK evaluation, sub-millisecond checks, streamed rule updates, agent integration through MCP and a skills library, and controlled publishing. Pricing is based on users with platform access, while cloud and self-hosted Enterprise options are available. Freedom Mortgage is also building an internal system and will compare build-versus-buy considerations. A formal POC requires NDA, InfoSec, Enterprise Architecture, and NSS approvals, with GrowthBook and LaunchDarkly expected to be compared in Q1. SaaS is preferred pending InfoSec review, and build-versus-buy materials were requested.\n\n## Keywords\nFeature flagging, Agent experimentation, CI/CD modernisation, Warehouse-native analytics, Build versus buy, Enterprise POC\n\n## Action Items\n**Scott Keller**\nSend presentation materials (21:28)\nSend build-versus-buy material (35:15)\nSupport GrowthBook proof of concept (35:59)\n\n**Pawanjit Singh**\nOpen Information Security review ticket (31:36)\nOpen Enterprise Architecture review ticket (31:36)\nComplete NDA process (31:36)\nStart NSS approval process (32:42)\nInitiate vendor proof-of-concept process (35:36)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7Q96CREY21PE3CAGNGTYKMV",
+      "source": "fireflies",
+      "title": "Demo Call with Illia Frantsevskyi from Scrambly",
+      "date": "2026-11-20",
+      "duration_minutes": 11.5600004196167,
+      "summary": "# Demo Call with Illia Frantsevskyi from Scrambly\nDate: 2026-11-20 | Duration: 11.5600004196167m\n\n## Summary\nEnterprise pricing was considered too expensive, at about €30,000 plus per-user costs, compared with current spending of about €500 monthly, or approximately €6,000 annually. The higher price was viewed as unjustified because the team mainly uses GrowthBook for experiment bucketing, launching experiments, and managing feature flags, while metrics and analytics are handled externally and GrowthBook’s analytics capabilities are unused. The team needs parallel experiments in the same funnel area to use clean, independent samples, excluding users already exposed to an existing experiment; a stated example involves removing a 30% exposure before running a second test. As the team and experiment volume grow, avoiding overlapping users is important for preventing wasted effort. Access to the requested feature requires internal review because the architecture does not support selective feature access. Pro and Enterprise remain the standard access paths, without feature-by-feature pricing. Marcel will investigate options for a middle-ground solution that preserves the current use case, enables parallel experimentation, and avoids an unjustified cost.\n\n## Keywords\nGrowthBook Enterprise, Experiment bucketing, Feature flags, Parallel experiments, User exclusion, Pricing negotiation\n\n## Action Items\n**Marcel Geldner**\nReview GrowthBook access options (03:28)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]
