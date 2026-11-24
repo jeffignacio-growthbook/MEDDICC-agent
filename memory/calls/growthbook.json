@@ -1,7 +1,7 @@
 {
   "company": "Growthbook",
   "slug": "growthbook",
-  "last_etl_date": "2026-11-18T08:02:54.655326",
+  "last_etl_date": "2026-11-24T10:33:16.308706",
   "calls": [
     {
       "id": "01KGHY46Z2XRQ494JJYXYSJ57B",
@@ -275,6 +275,17 @@
       "summary": "# Growthbook - Warehouse Native Product Analytics Demo\nDate: 2026-11-17 | Duration: 56.619998931884766m\n\n## Summary\nThe discussion evaluated GrowthBook as a warehouse-native platform aligned with Home Depot’s strategy of keeping data in BigQuery and using external tools as layers. GrowthBook demonstrated Explorer, dashboards, journeys, funnels, SQL analysis, experimentation, feature flags, and governed metrics using warehouse data. Key evaluation issues include BigQuery query latency, event freshness, configurable dashboard and experiment refreshes, and technical compatibility with Home Depot’s complex stack. Self-hosted and air-gapped deployment can keep data within Home Depot, while enterprise licensing adds certified metrics, custom AI guidance, SSO, audit logs, and fine-grained permissions. Session replay is still in development, with cohort filtering, variant-versus-control analysis, and AI summaries requiring confirmation. The next steps are NDA completion, technical discovery covering implementation and data flows, InfoSec PSRB review, and a potential January POC, subject to technical and security approval.\n\n## Keywords\nWarehouse-native analytics, BigQuery, Experimentation, Feature flags, Session replay, Metric governance\n\n## Action Items\n**Scott Keller**\nSend Home Depot follow-up summary (25:26)\nRank requested product capabilities (25:26)\n\n**Kishen Jayanti**\nInitiate Home Depot NDA process (45:01)\n\n**Home Depot technical and security teams**\nConduct deeper technical fit discussion (45:01)\nComplete InfoSec PSRB review (45:32)",
       "organizer": "scott.keller@growthbook.io",
       "participants": 12,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7X1WPDMA3QA7HC4DV5N6JWY",
+      "source": "fireflies",
+      "title": "Growthbook - A/B test sync",
+      "date": "2026-11-23",
+      "duration_minutes": 25.75,
+      "summary": "# Growthbook - A/B test sync\nDate: 2026-11-23 | Duration: 25.75m\n\n## Summary\nThe team reviewed a GrowthBook experiment designed to test whether updated hero-banner content increases clicks to the Hero page. The new site, launched in early June, had improved time on page, engaged visitors, menu use, and relevant-page visits, but hero-banner engagement remained below expectations after “Portfolio” content was replaced by “What drives us” during the June brand sprint. The experiment uses 50% control and 50% variation, with an initial 20% rollout and phased expansion. BigQuery supplies experiment metrics using standard Google Analytics definitions, while CTA tracking remains in GTM and Google Analytics rather than being sent directly to GrowthBook. A/A validation was considered complete, but the experiment remained in draft pending review of a GrowthBook soft warning, Simon’s sign-off, and ending the existing experiment. Phillip is expected to join the GrowthBook channel to support analytics and front-end tracking.\n\n## Keywords\nGrowthBook, A/B testing, Hero-banner optimisation, Google Analytics, BigQuery, Feature flags\n\n## Action Items\n**Erik B**\nMove hero-banner experiment (17:18)\nConfigure experiment exposure (17:18)\nObtain Simon's sign-off (19:28)\nEnd A/A test (20:18)\nStart hero-banner experiment (17:18)\nHold follow-up discussion with Phillip (21:07)\n\n**Chris Sanders**\nInvestigate GrowthBook warning banner (18:23)\nInvite Phillip to GrowthBook channel (19:28)",
+      "organizer": "chris@growthbook.io",
+      "participants": 6,
       "summary_quality": "good"
     }
   ]

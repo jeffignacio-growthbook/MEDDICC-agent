@@ -1,7 +1,7 @@
 {
   "company": "Johnny / Jeremy",
   "slug": "johnny-jeremy",
-  "last_etl_date": "2026-11-03T07:23:32.473286",
+  "last_etl_date": "2026-11-24T10:33:16.301009",
   "calls": [
     {
       "id": "01M1CPHH6FV29WP3AG291HZSWM",
@@ -76,6 +76,17 @@
       "date": "2026-11-02",
       "duration_minutes": 21,
       "summary": "# Johnny / Jeremy\nDate: 2026-11-02 | Duration: 21m\n\n## Summary\nThe team brought the dashboard homepage near completion by adding hover states, simplifying navigation, removing the Create button, replacing the recent-dashboard screen with type-ahead search, and refining empty states. Feature previews for feature flags, experiments, and dashboards were separated into a broader project. Dashboard creation will use the global AI assistant, keep dashboards editable as drafts until Save, and preserve widget hover and click behavior during preview. Existing onboarding flows for GrowthBook Cloud, Enterprise, Self-Hosted, and organization presets are under review, with a deep dive planned for tomorrow around noon Pacific involving Johnny, Gabe, Michael Sampler, Michael Knowlton, and Guy. Claude-based setup may reduce the need for initial product UI, but setup guidance and onboarding messaging remain unresolved. Johnny will finish homepage revisions before handing them to No Boo, while Jeremy will prioritize analytics projects and identify design needs.\n\n## Keywords\nDashboard design, AI assistant, Feature flag previews, Onboarding, Widget interaction, Product analytics\n\n## Action Items\n**Johnny Martinez**\n- Apply dashboard home-page changes (09:30)\n- Revise AI dashboard creation flow (14:39)\n- Continue onboarding design work (14:39)\n- Continue attributes work (19:24)\n\n**Jeremy Dorn**\n- Hold onboarding deep dive (18:58)\n- Develop product analytics projects (19:47)",
+      "organizer": "johnny@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M84ZZYAZ7A9CWGQGSF9TAZND",
+      "source": "fireflies",
+      "title": "Johnny / Jeremy",
+      "date": "2026-11-23",
+      "duration_minutes": 27,
+      "summary": "# Johnny / Jeremy\nDate: 2026-11-23 | Duration: 27m\n\n## Summary\nThe team discussed making metric creation easier by configuring fact-table data in Explorer and saving the configured value block directly as a named metric, including full-screen exploration and editable filters. The AI workflow will retain data-source selection, support creation from a board or chat, and remove irrelevant experiment-focused configuration prompts. Jeremy preferred assistant interactions in the right rail and supported product-analytics annotations for explaining graph spikes, while broader commenting across product areas was deferred. Homepage ideas included attention filters, lightweight pagination, and possibly removing the subheading. Dashboard defaults may be organized by organization, project, and user, with user settings taking precedence. Johnny planned to refine the metric, AI, and homepage designs, while feedback from Michael Knowlton and Nobu remained pending.\n\n## Keywords\nFact-table metrics, Product analytics Explorer, Create AI, Dashboard defaults, Graph annotations, Homepage UX\n\n## Action Items\n**Johnny Martinez**\nExplore fact-table metric workflow (09:15)\nReview Create AI concept with Michael Knowlton (10:54)\nSimplify Create AI data-source experience (11:40)\nAdd AI build entry point from board (12:20)\nKeep assistant functionality in right rail (14:36)\nComplete Create AI and homepage design changes (19:36)\nBegin fact-table metric creation flow implementation (25:43)",
       "organizer": "johnny@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

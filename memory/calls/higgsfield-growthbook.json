@@ -1,0 +1,18 @@
+{
+  "company": "Higgsfield + GrowthBook",
+  "slug": "higgsfield-growthbook",
+  "last_etl_date": "2026-11-24T10:33:16.309585",
+  "calls": [
+    {
+      "id": "01M7N9AZ2QNQ2SZFQRXS0JFVJ4",
+      "source": "fireflies",
+      "title": "Higgsfield + GrowthBook",
+      "date": "2026-11-23",
+      "duration_minutes": 17.520000457763672,
+      "summary": "# Higgsfield + GrowthBook\nDate: 2026-11-23 | Duration: 17.520000457763672m\n\n## Summary\nHiggsfield uses more than 100 GrowthBook feature flags across development and production and has completed several experiments, including winning tests. GrowthBook supports comparisons of models, prompts, cost, speed, and quality, with winning experiments potentially generating approximately $250,000 annually. Higgsfield is currently on the Pro plan with month-to-month billing, and projected annual spend was presented as $336,000 as traffic grows. GrowthBook proposed an enterprise package priced at $296,000 annually, including 567 million monthly CDN requests, enterprise features, additional CDN capacity, lower pricing for incremental requests, and team support. Requests above the included amount would incur additional charges, with 1 million extra requests quoted at up to $8.33. Higgsfield still needs to assess traffic, bandwidth, CDN demand, upfront costs, and incremental charges. Christian will send revised line-item materials, while Jamil will coordinate review with product and analytics teams. Both sides identified year-end as the target for addressing the commercial decision.\n\n## Keywords\nGrowthBook Enterprise pricing, Higgsfield CDN usage, Feature flags, A/B experimentation, Predictable pricing, Annual contract\n\n## Action Items\n**Jamil Atabayev**\nShare GrowthBook pricing presentation (13:07)\nDiscuss pricing and product fit (13:59)\nReturn pricing feedback to Christian (14:30)\nAddress pricing decision (16:27)\n\n**Christian Liebenow**\nSend simplified pricing presentation (14:34)",
+      "organizer": "christian@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

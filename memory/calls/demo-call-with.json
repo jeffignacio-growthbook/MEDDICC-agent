@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-11-21T07:50:19.797158",
+  "last_etl_date": "2026-11-24T10:33:16.311829",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1334,6 +1334,28 @@
       "duration_minutes": 11.5600004196167,
       "summary": "# Demo Call with Illia Frantsevskyi from Scrambly\nDate: 2026-11-20 | Duration: 11.5600004196167m\n\n## Summary\nEnterprise pricing was considered too expensive, at about €30,000 plus per-user costs, compared with current spending of about €500 monthly, or approximately €6,000 annually. The higher price was viewed as unjustified because the team mainly uses GrowthBook for experiment bucketing, launching experiments, and managing feature flags, while metrics and analytics are handled externally and GrowthBook’s analytics capabilities are unused. The team needs parallel experiments in the same funnel area to use clean, independent samples, excluding users already exposed to an existing experiment; a stated example involves removing a 30% exposure before running a second test. As the team and experiment volume grow, avoiding overlapping users is important for preventing wasted effort. Access to the requested feature requires internal review because the architecture does not support selective feature access. Pro and Enterprise remain the standard access paths, without feature-by-feature pricing. Marcel will investigate options for a middle-ground solution that preserves the current use case, enables parallel experimentation, and avoids an unjustified cost.\n\n## Keywords\nGrowthBook Enterprise, Experiment bucketing, Feature flags, Parallel experiments, User exclusion, Pricing negotiation\n\n## Action Items\n**Marcel Geldner**\nReview GrowthBook access options (03:28)",
       "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7ZMZMFXFDJXBKS6GPBWTRKA",
+      "source": "fireflies",
+      "title": "Demo Call with Konstantin Root from Paradym Holdings OÜ",
+      "date": "2026-11-23",
+      "duration_minutes": 27,
+      "summary": "# Demo Call with Konstantin Root from Paradym Holdings OÜ\nDate: 2026-11-23 | Duration: 27m\n\n## Summary\nGrowthBook’s self-hosted deployment was nearing completion, with integrations still in progress and custom roles and projects desired. The twenty-engineer team emphasized pricing sensitivity because its enterprise requirements are limited and much of the available functionality is unnecessary. Self-hosting starts at $30,000, while cloud starts at $50,000; both include unlimited experiments and feature flags, and a possible approval-dependent floor near $20,000 was discussed. Enterprise support includes direct Slack access, product and engineering assistance, custom-build help, security governance, self-hosted deployment support, and a 99.99% uptime SLA with 24/5 human support. Concerns remain about GrowthBook proxy reliability, including payload retrieval and avoiding client exposure, so a custom proxy may be needed. Enterprise value and CFO approval remain unresolved, while open-source deployment is still practical because the infrastructure is simple and enterprise features are considered noncritical. Marcel will review the lowest feasible offer, and the contract still needs clarification on proprietary extensions and customer-developed elements.\n\n## Keywords\nGrowthBook enterprise pricing, Self-hosted deployment, Custom roles, Proxy reliability, Support SLA, Open-source licensing\n\n## Action Items\n**Konstantin Root**\nEvaluate proxy replacement (06:12)\nDiscuss revised pricing offer (16:42)\n\n**Marcel Geldner**\nReview enterprise pricing (17:00)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M84B6ZAHCYMC5V8WD7AG7S20",
+      "source": "fireflies",
+      "title": "Demo Call with Edouard Gouilliard from Mainloop AI",
+      "date": "2026-11-23",
+      "duration_minutes": 9,
+      "summary": "# Demo Call with Edouard Gouilliard from Mainloop AI\nDate: 2026-11-23 | Duration: 9m\n\n## Summary\nNo summary available",
+      "organizer": "scott.keller@growthbook.io",
       "participants": 2,
       "summary_quality": "good"
     }

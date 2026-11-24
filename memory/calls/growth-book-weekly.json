@@ -1,7 +1,7 @@
 {
   "company": "Growth Book Weekly",
   "slug": "growth-book-weekly",
-  "last_etl_date": "2026-11-17T08:40:23.068726",
+  "last_etl_date": "2026-11-24T10:33:16.307072",
   "calls": [
     {
       "id": "01KFXSR394CVCHJ1HKJKM5HSTE",
@@ -515,6 +515,17 @@
       "date": "2026-11-16",
       "duration_minutes": 49.900001525878906,
       "summary": "# Growth Book Weekly Meeting\nDate: 2026-11-16 | Duration: 49.900001525878906m\n\n## Summary\nBoard confidence remains strong, with positive views on company progress, revenue, and execution, while encouraging further growth. The discussion reviewed experimentation research: LLM evaluations and synthetic users can screen ideas but require human calibration and often disagree with real user data, making A/B testing more dependable for final decisions. Interleaving, switchback testing, adaptive testing, parameterized interfaces, and config parameter locks were discussed as product opportunities for increasingly agentic experimentation. The Puerto Vallarta retreat will run from February 21–27, with housing, transportation, work schedules, guest policies, travel allowances, reimbursement requirements, and preparation deadlines clarified; forms are due November 30 and flight itineraries by December 18. GrowthBook is also improving agent-led discovery, SEO and AEO visibility, automated onboarding, and its no-account product tour, while keeping the tour separate from the sales demo environment.\n\n## Keywords\nExperimentation, LLM evaluations, Synthetic users, Experiment learnings, Company retreat, Product onboarding\n\n## Action Items\n**Luke Sonnet**\nShare conference learnings internally (28:15)\n\n**Graham McNicoll**\nReview GrowthBook Configs capabilities (28:30)\n\n**Jennifer Pham-Le**\nFinalize retreat logistics (30:30)\nArrange transportation (30:30)\nMaintain reimbursement guidance (30:30)\n\n**Retreat attendees**\nJoin retreat channel (39:29)\nComplete planning form (39:29)\nBook retreat flights (39:29)\nShare itinerary (39:29)\nReview expense policy (39:29)\nVerify travel requirements (39:29)\n\n**Jeremy Dorn**\nImprove product tour (47:03)\nShare onboarding updates in Slack (47:03)",
+      "organizer": "graham@growthbook.io",
+      "participants": 40,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7GTFX7WMYAMMFDPSB7YYNE6",
+      "source": "fireflies",
+      "title": "Growth Book Weekly Meeting",
+      "date": "2026-11-23",
+      "duration_minutes": 15.229999542236328,
+      "summary": "# Growth Book Weekly Meeting\nDate: 2026-11-23 | Duration: 15.229999542236328m\n\n## Summary\nSales bookings reached $200K, including Jake S.’s first deal: a $65K, five-seat contract with a Hong Kong-based company that converts images into 3D online images. December 31 was positioned as the prospect year-end, with January reserved for additional growth. The Q4 pipeline supports 2.5–3x growth excluding Anthropic, based on a prior Q4 baseline of $900K, while an Anthropic renewal could support more than 3x total growth. GrowthBook gained strategic exposure at a 150-person European conference in Texel, though attendees often misunderstood its support for server-side, client-side, and app-side testing. Marketing launched the Java SDKs and newest TypeScript SDK while responding to the Optimizely security incident. Security concerns are increasingly important to buyers, with penetration testing, visual-editor protections, dependency monitoring, and SOC 2 work underway. Approximately three full-time engineers support ongoing security efforts, and additional updates are expected within one to two weeks.\n\n## Keywords\nSales pipeline, Anthropic renewal, Conversion optimisation, European conference, SOC 2, Client-side security\n\n## Action Items\n**Ryan McGurk**\n- Execute active sales opportunities (01:43)\n\n**Jeremy Dorn**\n- Complete penetration test (09:02)\n- Harden visual editor (09:02)\n- Monitor dependencies and threats (09:36)",
       "organizer": "graham@growthbook.io",
       "participants": 40,
       "summary_quality": "good"

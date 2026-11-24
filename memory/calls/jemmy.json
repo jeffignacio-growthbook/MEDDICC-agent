@@ -1,7 +1,7 @@
 {
   "company": "jemmy",
   "slug": "jemmy",
-  "last_etl_date": "2026-11-17T08:40:23.062391",
+  "last_etl_date": "2026-11-24T10:33:16.297711",
   "calls": [
     {
       "id": "01M50KRESEEN9ESRNX9Z2GVSJA",
@@ -43,6 +43,17 @@
       "date": "2026-11-16",
       "duration_minutes": 35.06999969482422,
       "summary": "# jemmy\nDate: 2026-11-16 | Duration: 35.06999969482422m\n\n## Summary\nThe team approved reinstating compact newsletter CTAs, including a right-column module and inline subscription design with an email field, while clarifying the Growth book newsletter’s benefits and retaining the Uplift identity. The newsletter launch is targeted for this week; the landing page is drafted, but HubSpot form styling remains. The blog CTA will sit below FAQs, with related articles below it, while privacy-policy wording and a locally fixed mobile width issue remain unresolved. Jack Ops priorities include defining marketing metrics, setting project-selection guardrails, assessing the value of cross-team transcript data, and reinforcing Emmy’s internal ownership. PLG research is focused on onboarding interviews and free-versus-pro pricing, with broader work and possible G2 exploration considered later. Capacity is constrained by small website and publishing requests, so workload support, automation, and improved support access are being explored. Jemmy’s launch content is targeted for Wednesday end-of-day, pending feedback from Jemmy and Guy.\n\n## Keywords\nNewsletter CTA, HubSpot forms, Jemmy, Jack Ops, PLG research, Support meetings\n\n## Action Items\n**Emmy Sharp**\nLaunch GrowthBook newsletter (07:57)\nTest HubSpot subscription form (10:09)\nDefine measurement framework (18:11)\n\n**Jack Virag**\nAdd newsletter CTA (08:12)\nFix blog article layout (26:36)\nContact August Allard (31:06)\nCoordinate Jemmy content launch (33:08)\nShare Jemmy blockers (33:08)",
+      "organizer": "jack@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7NG55S5JS1N1JR92AAJ4K6X",
+      "source": "fireflies",
+      "title": "jemmy",
+      "date": "2026-11-23",
+      "duration_minutes": 38.91999816894531,
+      "summary": "# jemmy\nDate: 2026-11-23 | Duration: 38.91999816894531m\n\n## Summary\nThe team discussed strengthening support security messaging by clarifying customer-data access, opt-in requirements, and related blog and marketing updates. An August discovery session with Emmy will identify customer-information gaps and potential initiatives, while customer-health scoring will be explored to target happy customers for G2 reviews. The CAPA chatbot website is being prepared, with pricing responses requiring review. Publishing priorities include finalizing Natasha’s support-article edits, adding technical context, publishing it as a blog post, and redesigning two Daniel sales articles with comic-style flowcharts while preserving rebrand flexibility. G2 permissions remain uncertain; Emmy is checking access and Jack can provide copy. Comparison pages are nearly ready for CMS migration, with Yusuf’s demonstration available, but the Webflow preview is failing. The team plans to retain rich text, tables, and at-a-glance sections and create a channel with Karen and Yusuf. Growth work includes Uplift CTAs, UGC feasibility research, better Pro upgrade visibility, and newsletter improvements using blog content, human quotes, and no newsletter-only material.\n\n## Keywords\nCMS comparison pages, CAPA chatbot, G2 reviews, Customer health metrics, UGC programme, Newsletter strategy\n\n## Action Items\n**Emmy Sharp**\n- Hold one-on-one with August (00:00)\n- Review support messaging (00:55)\n- Ask August about customer metrics (01:14)\n- Deploy CAPA chatbot (01:58)\n- Confirm G2 permissions (03:27)\n- Set up shared Slack channel (17:12)\n- Add uplift CTAs (24:20)\n- Continue chatbot work (24:20)\n- Investigate UGC programme (24:20)\n- Update G2 outreach emails (25:48)\n- Examine Pro plan features (25:48)\n- Refine newsletter value proposition (29:38)\n\n**Jack Virag**\n- Help Alyssa with G2 work (03:11)\n- Add technical support details (03:43)\n- Publish Natasha’s support article (03:43)\n- Publish Daniel’s sales articles (04:13)\n- Remake sales flowcharts (04:13)\n- Encode CMS comparison skill (14:10)\n- Publish CMS comparison skill (14:10)\n- Migrate comparison pages (14:42)\n- Coordinate CMS implementation (14:42)",
       "organizer": "jack@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

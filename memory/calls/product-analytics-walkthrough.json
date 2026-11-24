@@ -1,0 +1,18 @@
+{
+  "company": "Product Analytics Walkthrough",
+  "slug": "product-analytics-walkthrough",
+  "last_etl_date": "2026-11-24T10:33:16.298143",
+  "calls": [
+    {
+      "id": "01M7QPAQN9XVQTFM9PRZSP1J7S",
+      "source": "fireflies",
+      "title": "Product Analytics Walkthrough",
+      "date": "2026-11-23",
+      "duration_minutes": 48.099998474121094,
+      "summary": "# Product Analytics Walkthrough\nDate: 2026-11-23 | Duration: 48.099998474121094m\n\n## Summary\nThe session prepared Chris Sanders, Logan Bates, Scott Bailey, and Elyse Fox to explain GrowthBook’s product analytics capabilities in sales and demos, with Jeremy Dorn providing technical context. GrowthBook was positioned between event analytics tools such as Amplitude, Mixpanel, and PostHog and BI platforms such as Tableau, Mode, and Hex. Its warehouse-native architecture uses existing warehouse data, supports optional event forwarding, and connects product analytics with experimentation through shared metrics. Core capabilities include Metric Explorer, Fact Table Explorer, User Journeys, funnels, dashboards, AI-assisted exploration, and Session Replay. Funnels can be saved as metrics and linked to experiments, while caching helps reduce query cost and latency. The product was estimated to cover 80–90% of common analytics use cases, particularly for casual users, although power-user needs may exceed current depth. Session Replay remains in beta, with heat maps, mobile support, richer experiment links, and other capabilities still limited or under development. Sales demos should emphasize AI exploration, completed dashboards, and query transparency while avoiding dashboard editing workflows. Dashboard and homepage redesigns are underway, with AI intended to become the primary analytics interface.\n\n## Keywords\nProduct analytics, Warehouse-native analytics, Metric Explorer, User Journeys, Funnels, Session Replay\n\n## Action Items\n**Jeremy Dorn**\nRedesign dashboard user experience (08:52)\nAdd multiple identifying columns (22:39)\nDevelop experiment exposure filtering (23:28)\n\n**Michael Knowlton**\nInvestigate exploratory query storage (18:06)\nReview Session Replay mobile support (36:07)\nShare meeting recording (46:24)\n\n**Nobu**\nRework product analytics homepage (44:48)",
+      "organizer": "michael@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

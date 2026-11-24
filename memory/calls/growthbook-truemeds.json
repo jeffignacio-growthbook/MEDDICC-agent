@@ -1,7 +1,7 @@
 {
   "company": "Growthbook <> Truemeds",
   "slug": "growthbook-truemeds",
-  "last_etl_date": "2026-10-23T05:34:42.366967",
+  "last_etl_date": "2026-11-24T10:33:16.296506",
   "calls": [
     {
       "id": "01M4P7192455WJN74M539BPDY4",
@@ -34,6 +34,17 @@
       "summary": "# Growthbook <> Truemeds - Pricing\nDate: 2026-10-22 | Duration: 31.639999389648438m\n\n## Summary\nGrowthBook, Statsig, and Datadog were reported to have feature parity, leaving commercial terms as the primary factor in the vendor decision. Quotes remained under evaluation, with additional Datadog estimates and static quotes expected. The Snowflake migration for Qlikstream data was delayed until November end because front-end engineering bandwidth was committed to higher-impact projects. Fundraising this quarter has increased scrutiny of gross margin, EBITDA profitability, and the return on new costs. GrowthBook proposed a $50,000 platform fee plus $300 per experiment, with higher-volume pricing potentially reducing the experiment cost toward $250; 300–500 experiments were estimated at approximately $145,000–$175,000 annually, with no rollover of unused capacity. The preferred deployment is warehouse-native through Snowflake, requiring permissions, data mapping, fact tables, and SDK integration. A three-to-four-week trial is planned after the migration, supported by onboarding and integration assistance. Follow-up actions include exploring Google Chat support, finding India or APAC customer references, and sending implementation materials.\n\n## Keywords\nSnowflake migration, Experiment pricing, GrowthBook trial, Warehouse-native experimentation, Support coverage, Vendor evaluation\n\n## Action Items\n**Pranav Chavan**\nComplete Snowflake migration (01:58)\nEvaluate vendor quotations (05:31)\nShare competing pricing quotes (25:28)\nReview trial results (27:03)\n\n**Dan Wathne**\nInvestigate Google support process (09:11)\nCheck customer reference availability (18:40)\nOpen GrowthBook trial (20:23)\nCoordinate trial onboarding (20:23)\nSend implementation documentation (22:03)\nSend meeting recap (29:54)",
       "organizer": "dan@growthbook.io",
       "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M812H6PD2W10THR2MHX9N66V",
+      "source": "fireflies",
+      "title": "Growthbook <> Truemeds - Pricing Sync",
+      "date": "2026-11-24",
+      "duration_minutes": 13.319999694824219,
+      "summary": "# Growthbook <> Truemeds - Pricing Sync\nDate: 2026-11-24 | Duration: 13.319999694824219m\n\n## Summary\nThe team compared Datadog, Statsig, Mixpanel, and GrowthBook for an experimentation and analytics solution. Datadog quoted 40K for 350 annual experiments, while Statsig quoted 65K for 500 million monthly events; Mixpanel pricing was still pending. GrowthBook planned to seek approval for a package in the low 50s covering 350 annual experiments, although the platform fee and per-experiment pricing were not finalized. The evaluation includes cloud-native and warehouse-native approaches, with event-transmission costs, analytics capabilities, and overall economics as key factors. Snowflake can receive exported Mixpanel data and connect to GrowthBook as a data source. GrowthBook also proposed dedicated support, a private Slack channel, and a Tokyo-based technical solutions engineer. Dan planned to send written pricing for leadership review, while Yashraj planned to obtain Mixpanel pricing, share competing quotes, and present the options to leadership. The team expects to choose one vendor for a trial, potentially beginning or being scoped the following week, while GrowthBook is seeking a year-end signature.\n\n## Keywords\nGrowthBook pricing, Datadog, Statsig, Mixpanel, Warehouse-native experimentation, Snowflake integration\n\n## Action Items\n**Dan Wathne**\nObtain internal approval (05:29)\nPrepare formal proposal (08:49)\nSend completed proposal (11:42)\n\n**Yashraj Adik**\nObtain Mixpanel pricing quote (10:01)\nShare Mixpanel pricing quote (10:01)",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

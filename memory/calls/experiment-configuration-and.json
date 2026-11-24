@@ -1,0 +1,18 @@
+{
+  "company": "Experiment Configuration and",
+  "slug": "experiment-configuration-and",
+  "last_etl_date": "2026-11-24T10:33:16.297428",
+  "calls": [
+    {
+      "id": "01M854T26M1BCAF6WZTMJY9KS6",
+      "source": "fireflies",
+      "title": "Experiment Configuration and Analysis Planning",
+      "date": "2026-11-23",
+      "duration_minutes": 27.440000534057617,
+      "summary": "# Experiment Configuration and Analysis Planning\nDate: 2026-11-23 | Duration: 27.440000534057617m\n\n## Summary\nThe discussion established configuration and delivery requirements for switchback experiments. The configuration UI should use an overview card rather than a modal, require scheduling before launch, and show the most recent switchback flip for auditability. Assignment visibility should include enrollment schedules, retrospective comparisons between expected and actual regimes, and potentially a cluster matrix for smaller samples, while pre-bucketing was deferred. Feature flags are expected to begin server-side, with experiments represented through reference rules; the feature-flag UI is low priority, and Michael was assigned the bandits implementation review. Results analysis still needs a resolution for first-period parallel analysis, a banner for parallel states, and graceful handling when zero metrics may break the SQL estimator. Gabe has sufficient configuration direction, the configuration UI contains most of the design work, an SDK backend review needs scheduling, and a science SQL sync is planned with Luke.\n\n## Keywords\nSwitchbacks, Experiment configuration, Assignment scheduling, Feature flags, Health tab, Variance reduction\n\n## Action Items\n**Michael Samper**\nReview Bandits implementation (12:06)\n\n**Gabe Melean**\nDraft switchback experiment UI (25:26)\n\n**Luke Smith**\nSchedule SDK/backend discussion (25:43)\nCoordinate science/SQL review (25:43)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

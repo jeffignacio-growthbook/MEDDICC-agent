@@ -1,7 +1,7 @@
 {
-  "company": "GrowthBook <> Rippling",
+  "company": "GrowthBook + Rippling",
   "slug": "growthbook-rippling",
-  "last_etl_date": "2026-09-03T06:04:10.803525",
+  "last_etl_date": "2026-11-24T10:33:16.300566",
   "calls": [
     {
       "id": "01M0646X368X9DD7ZPQTSYEXTC",
@@ -26,6 +26,17 @@
       "date": "2026-08-31",
       "duration_minutes": 26,
       "summary": "# GrowthBook <> Rippling\nDate: 2026-08-31 | Duration: 26m\n\n## Summary\nJennifer Pham-Le is evaluating Rippling, Brex, and Expensify, with pricing as a major consideration. Expensify was cited at $5 per user, while Brex offers free reimbursements; Rippling currently charges $8 per user per month. Jennifer does not plan to use Rippling cards and mainly wants reimbursements processed through payroll. She values Rippling’s ability to group expenses by report, a feature Brex lacks, as well as its payroll and reporting integration. Prasanna emphasized that Rippling consolidates finance workflows and said discounted pricing could potentially approach $5 or become free if corporate-card spend supports it, subject to finance approval and contract timing. Jennifer also raised concern that competitors provide record access for up to seven years after engagement, while Rippling access apparently ends when the contract ends. Prasanna agreed to escalate data retention to the product team, review pricing with finance, and follow up. Rippling currently offers SSO access to third-party apps such as Expensify rather than a deeper direct integration. Jennifer has no urgent decision timeline and is awaiting updated pricing and product information.\n\n## Keywords\npricing negotiation, reimbursement platform, expense reporting, receipt storage, card spend integration, platform comparison\n\n## Action Items\n\n**Prasanna Venkatesh Jeyakumar**\nConsult with Rippling’s finance team to explore revised pricing options possibly matching $5/user/month or lower (09:16)\nInvestigate and seek internal approval regarding extending receipt storage accessibility beyond immediate cutoff after leaving Rippling (13:37)\nAssess opportunity for discounted or zero-cost pricing linked to potential card spend migration to Rippling (14:38)\nProvide Jennifer Pham-Le with updated pricing proposals and receipt storage information (15:54)\n\n**Jennifer Pham-Le**\nReach out to Rippling account manager to schedule or request a demo focused on Expensify integration within Rippling (11:26)\n",
+      "organizer": "jennifer@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7GECGZGS2YGNN2SN955EV06",
+      "source": "fireflies",
+      "title": "GrowthBook + Rippling Account Review",
+      "date": "2026-11-23",
+      "duration_minutes": 26.639999389648438,
+      "summary": "# GrowthBook + Rippling Account Review\nDate: 2026-11-23 | Duration: 26.639999389648438m\n\n## Summary\nMelisa outlined technical account-management support focused on platform enablement, product adoption, feedback, strategic planning, scaling, and possible new-team-member enablement; Jennifer reported no immediate account-support needs. Melisa committed to send year-end checklist and tax-readiness resources, with webinar recordings and follow-up support available (08:41–10:46). Jennifer’s accounting team paused Rippling bill pay and vendor-payment adoption, while EOR reimbursements and expense management still need to use Rippling; Michael offered accounting-team access as spend-only users if needed (12:00–12:48). Michael presented the April 7–8 San Francisco XFN event, priced at approximately $750 before year-end and expected to rise to $1,000 afterward; Jennifer will review the agenda and event details (13:18–17:35). A January 7 review at 10:30 PT was targeted for May renewal planning, initially with Jennifer, Melisa, and Michael (18:46–21:39). Jennifer will retrieve a journal report to investigate a possible 401go contribution discrepancy, with Melisa offering further reporting support if needed (22:16–25:05).\n\n## Keywords\nRippling account review, Year-end planning, Spend management, Rippling XFN, Renewal planning, Payroll journal report\n\n## Action Items\n**Melisa Garcia**\nSend GrowthBook year-end planning resources (10:13)\nSupport payroll journal report follow-up (25:11)\n\n**Michael Zabrowski**\nNotify Persona about GrowthBook’s Rippling pause (12:25)\nBring renewal pricing to January business review (21:29)\nSend GrowthBook Rippling XFN event information (21:52)\n\n**Unassigned**\nHold January business review (19:18)\n\n**Jennifer Pham-Le**\nRun payroll journal report (24:29)\nDownload completed payroll journal report (25:11)",
       "organizer": "jennifer@growthbook.io",
       "participants": 3,
       "summary_quality": "good"

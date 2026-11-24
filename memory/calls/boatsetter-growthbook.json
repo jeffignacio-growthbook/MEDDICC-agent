@@ -1,0 +1,18 @@
+{
+  "company": "Boatsetter + GrowthBook",
+  "slug": "boatsetter-growthbook",
+  "last_etl_date": "2026-11-24T10:33:16.297994",
+  "calls": [
+    {
+      "id": "01M7TMK3YWFJ2M0PCVS7CDCAN3",
+      "source": "fireflies",
+      "title": "Boatsetter + GrowthBook",
+      "date": "2026-11-23",
+      "duration_minutes": 35.61000061035156,
+      "summary": "# Boatsetter + GrowthBook\nDate: 2026-11-23 | Duration: 35.61000061035156m\n\n## Summary\nBoatsetter and Getmyboat are being reworked, creating a need for faster, governed experimentation across product, engineering, data, notification, and email teams. Current processes limit velocity: Getmyboat manually configures tests and runs only one A/B test at a time, while Boatsetter uses Flipper with Hex and Snowflake for analysis. Previous experiments generated six-figure bottom-line gains, although AI and SEO effects made value difficult to isolate. GrowthBook demonstrated hypothesis and variant setup, feature flags, namespaces, MCP-based programmatic management, Bayesian analysis, Snowflake metrics, guardrails, health checks, result slicing, AI-assisted learning, and lightweight SDKs. Self-hosting through Docker and Kubernetes appears viable, but minimum requirements and OpenTelemetry integration need confirmation. Licensing, authoring-user scope, hosting model, plan selection, pricing, and vendor comparison remain open. The team plans to regroup during the holiday week, and Christian will share the recording with Mark for Alexis’s review.\n\n## Keywords\nGrowthBook, Experimentation platform, Feature flags, MCP server, Snowflake, A/B testing\n\n## Action Items\n**Mark Stange-Tregear**\nForward meeting recording (03:56)\nRegroup internally (34:10)\n\n**Christian Liebenow**\nProvide Enterprise list pricing (32:00)\nConfirm OpenTelemetry integration (28:11)\nProvide deployment requirements (33:22)\nSend meeting recording (34:10)",
+      "organizer": "christian@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook Product Leadership",
+  "slug": "growthbook-product-leadership",
+  "last_etl_date": "2026-11-24T10:33:16.296943",
+  "calls": [
+    {
+      "id": "01M7QTYKEWS8BGJR7SY9JPNCAS",
+      "source": "fireflies",
+      "title": "GrowthBook Product Leadership Demo",
+      "date": "2026-11-23",
+      "duration_minutes": 30.920000076293945,
+      "summary": "# GrowthBook Product Leadership Demo\nDate: 2026-11-23 | Duration: 30.920000076293945m\n\n## Summary\nResMed stakeholders reviewed GrowthBook as a way to accelerate experimentation and result delivery, particularly as AI coding tools increase pressure to match experimentation velocity. GrowthBook supports PM-led experiment setup, including hypotheses, targeting, traffic allocation, primary and secondary metrics, and guardrails, while also supporting existing assignment tooling such as PEEP. Its warehouse-native analysis uses existing customer data, Bayesian testing, treatment-control comparisons, lift estimates, and rollback recommendations when guardrails deteriorate. Feature changes remain dependent on ResMed’s SDKs, CMS integrations, or internal systems. Front-end, server-side, and LLM experimentation are supported when configurable values are exposed, but Dawn is not yet ready for fine-grained response control; ResMed would need to define parameters and connect them to Dawn. Self-hosting and keeping data within customer systems address healthcare-related security requirements. Nitant Bhartia preferred minimizing dependence on PEEP, while ResMed planned an internal review and requested further information about Maya’s configurability and Khan Academy examples.\n\n## Keywords\nGrowthBook, Experimentation, Feature Flags, Warehouse-Native Analytics, LLM Prompt Testing, ResMed\n\n## Action Items\n**Carlos Valverde**\nDefine Dawn configuration controls (25:03)\nReview Maya configurable capabilities (26:24)\n\n**Logan Bates**\nProvide Khan Academy experimentation examples (28:08)\n\n**Nick Bailey**\nFollow up with GrowthBook team (28:38)\n\n**Nitant Bhartia**\nCoordinate ResMed internal regroup (28:40)",
+      "organizer": "christian@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    }
+  ]
+}

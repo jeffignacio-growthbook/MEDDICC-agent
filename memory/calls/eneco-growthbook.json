@@ -1,0 +1,18 @@
+{
+  "company": "Eneco & GrowthBook",
+  "slug": "eneco-growthbook",
+  "last_etl_date": "2026-11-24T10:33:16.309437",
+  "calls": [
+    {
+      "id": "01M7JNPSP8CXK944T1P6FB0JA3",
+      "source": "fireflies",
+      "title": "Eneco & GrowthBook Dev Training/Review",
+      "date": "2026-11-23",
+      "duration_minutes": 55.65999984741211,
+      "summary": "# Eneco & GrowthBook Dev Training/Review\nDate: 2026-11-23 | Duration: 55.65999984741211m\n\n## Summary\nGrowthBook ownership is being broadened after the departure of Rishi Kumar and other engineers with implementation knowledge. The self-hosted platform, procured in March 2024, now supports approximately 70–80 experiments across Android, iOS, web, and feature flags. Platform engineering owns SDK implementation and updates, while enablement supports product managers and analysts. The current translation and middleware layers create limitations, including preventing Holdouts, so the preferred direction is to remove them and adopt GrowthBook Proxy. Randomisation occurs deterministically in SDKs, while exposure data and conversion metrics are analysed through warehouse fact tables. A single GrowthBook instance with separate application environments was recommended over multiple deployments. SDK versions are significantly outdated and should be updated with compatibility testing. The organisation will also compare GrowthBook Cloud with self-hosting, considering security, ownership, budget, regional data requirements, migration effort, and operational responsibilities.\n\n## Keywords\nGrowthBook proxy, Self-hosted deployment, Experiment randomisation, Remote evaluation, Feature flags, Snowflake fact tables\n\n## Action Items\n**Floortje**\nInvestigate DBT integration options (50:24)\n\n**Romy de Vries**\nPrepare internal GrowthBook Cloud discussion (52:36)\n\n**Chris Sanders**\nCoordinate GrowthBook Cloud information (53:25)\n\n**Cary**\nSend GrowthBook Cloud comparison (53:25)",
+      "organizer": "chris@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

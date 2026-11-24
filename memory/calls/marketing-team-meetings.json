@@ -1,7 +1,7 @@
 {
   "company": "Marketing Team Meetings",
   "slug": "marketing-team-meetings",
-  "last_etl_date": "2026-11-17T08:40:23.063803",
+  "last_etl_date": "2026-11-24T10:33:16.301996",
   "calls": [
     {
       "id": "01KGAQX200F3FCHJMSYE898TZD",
@@ -456,6 +456,17 @@
       "date": "2026-11-16",
       "duration_minutes": 61.150001525878906,
       "summary": "# Marketing Team Meetings\nDate: 2026-11-16 | Duration: 61.150001525878906m\n\n## Summary\nThe team clarified that agents can use GrowthBook SDKs without first creating an account, with launch content covering TypeScript setup, SDK guides, free features, blogs, and video. Agent adoption is the primary goal, positioning GrowthBook as the best free option for deploying feature flags while retaining unlimited free functionality and creating future upgrade paths. The ungated Tour GrowthBook demo should support self-serve discovery, with homepage and pricing-page placement testing, although its scripted experience and maintenance requirements remain risks. Jack Ops now supports repeatable publishing, research, social, and Webflow workflows, with competitor intelligence and HubSpot follow-up automation identified as next opportunities. Marketing will keep MCP content focused on its existing SEO value while redesigning the AI-native page around implementation, use cases, guardrails, and audience guidance. Product analytics priorities include updating messaging for Pro dashboard sharing, creating educational content, reviewing the engineering roadmap, and increasing adoption among existing customers. Sources: 02:00, 09:28, 16:33, 32:30, 43:56, 54:37.\n\n## Keywords\nAI agent SDKs, Product-led growth, Interactive product tour, Jack Ops automation, AI-native marketing, Product Analytics\n\n## Action Items\n**Alyssa Nicoll**\nCreate launch video content (04:23)\nFollow up on interactive product tour (31:50)\n\n**Jack Virag**\nRevise Agent Guide (04:41)\nDevelop supporting launch content (04:41)\nBuild competitor-information source of truth (36:19)\nLocate MCP server page (40:45)\n\n**Elyse Fox**\nRevise Agent Guide (04:41)\nBuild competitor-information source of truth (36:19)\nPlan product marketing priorities (50:03)\nUpdate Product Analytics website messaging (55:07)\n\n**Scott Bailey**\nBuild competitor-information source of truth (36:19)\nFollow up on interactive product tour (31:50)\nPlan product marketing priorities (50:03)\n\n**Emmy Sharp**\nDiscuss podcast publishing workflow (39:20)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7H0CTHG4N16D7BQQN5CF30M",
+      "source": "fireflies",
+      "title": "Marketing Team Meetings",
+      "date": "2026-11-23",
+      "duration_minutes": 60.29999923706055,
+      "summary": "# Marketing Team Meetings\nDate: 2026-11-23 | Duration: 60.29999923706055m\n\n## Summary\nThe team prioritized external distribution to help AI agents discover, trust, and use GrowthBook resources, emphasizing free feature flagging, developer workflows, and third-party channels such as Dev.to, Reddit, JavaScript Weekly, and developer communities. Alyssa owns Dev.to outreach, while Jeremy may support Reddit and other opportunities; channel activity will be reviewed on Monday. G2 review work continues, including administrator access and relationship-based requests. Elyse will return the contextual bandit to the live-demo version and test new copy, visuals, or presenter headshots, while the team compares GA4 and Plausible because GA4 covers roughly one-third of users. The newsletter reached 56–60 recipients, prompting tests of expert commentary, stronger calls to action, and improved placement visibility. Context OS now supports CTA recommendations, product-fact consistency, blog publishing, PR knowledge, and Webflow updates, with manual review retained for publishing.\n\n## Keywords\nAgent distribution, Feature flagging, Context OS, Newsletter growth, Contextual bandits, Webflow automation\n\n## Action Items\n**Alyssa Nicoll**\nCoordinate distribution of agent feature-flagging launch (06:20)\nLead Dev.to distribution effort (16:42)\nAudit promotional placements (31:05)\nAsk Lindsay for promotional inventory (32:07)\n\n**Jack Virag**\nRecord distribution channel outreach results (15:35)\n\n**Emmy Sharp**\nAdd Jack Virag to G2 administration (16:17)\nProvide Context OS walkthrough (27:30)\nAdd newsletter calls to action to blog content (33:00)\n\n**Elyse Fox**\nStop contextual-bandit website banner test (20:18)\nRun next website banner experiment (22:18)\nInvestigate Plausible integration requirements (22:58)\nTry Context OS workflow (53:27)",
       "organizer": "ashley@growthbook.io",
       "participants": 9,
       "summary_quality": "good"
