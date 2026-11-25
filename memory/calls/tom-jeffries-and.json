@@ -1,0 +1,18 @@
+{
+  "company": "Tom Jeffries and",
+  "slug": "tom-jeffries-and",
+  "last_etl_date": "2026-11-25T09:23:09.891293",
+  "calls": [
+    {
+      "id": "01M7T2P8CNT7ZJK44DHR09DRDP",
+      "source": "fireflies",
+      "title": "Tom Jeffries and James Shannon",
+      "date": "2026-11-24",
+      "duration_minutes": 11.539999961853027,
+      "summary": "# Tom Jeffries and James Shannon\nDate: 2026-11-24 | Duration: 11.539999961853027m\n\n## Summary\nSmart Kids’ manual A/B testing is limited by a lean data team of three, primarily data engineers, and its small sports-gambling user base makes statistical significance difficult to achieve. GrowthBook is being evaluated as a statistical analysis and experimentation platform, with a local version already deployed and potential future use by front-end teams for A/B testing. CUPED and post-stratification were discussed as variance-reduction techniques for lower-traffic environments. Self-hosted Pro access was approved in principle, with Smart Kids handling the technical setup and infrastructure. Initial access will cover three users, with possible expansion to five or six. Tom will sign up through the website, continue evaluating the local deployment, prepare an internal presentation, and email James after signup. James will provide a Pro license key for the initial users and share a product deck, excluding its enterprise slide for this discussion. Relevant capabilities include logged-in user-ID hashing for experiment assignment and sticky bucketing for consistent exposure across sessions, apps, and websites.\n\n## Keywords\nGrowthBook, A/B testing, CUPED, Post-stratification, Sticky bucketing, Self-hosting\n\n## Action Items\n**Tom Jeffries**\nComplete Pro tier sign-up (04:23)\nPresent GrowthBook internally (05:08)\nNotify James after account creation (09:05)\n\n**James Shannon**\nSend GrowthBook presentation deck to Tom (05:19)\nProvide Pro license key (09:05)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    }
+  ]
+}

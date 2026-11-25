@@ -1,7 +1,7 @@
 {
   "company": "Weekly 1:1 Elyse/Ashley",
   "slug": "weekly-1-1-elyse-ashley",
-  "last_etl_date": "2026-11-18T08:02:54.654390",
+  "last_etl_date": "2026-11-25T09:23:09.880428",
   "calls": [
     {
       "id": "01KMNXNAFYXZRY8GREHENGMFMS",
@@ -110,6 +110,17 @@
       "date": "2026-11-17",
       "duration_minutes": 32.439998626708984,
       "summary": "# Weekly 1:1 Elyse/Ashley\nDate: 2026-11-17 | Duration: 32.439998626708984m\n\n## Summary\nThe proposed Pro model shifts pricing to $150 per seat, including 5 million events, with additional usage at $50 per million events; break-even depends on event volume, with about 0.8 million events needed per added seat to match current $40 economics. Feature-flag pricing remains broadly comparable, while experiment pricing and segmentation require further analysis, including light, medium, and large users. The account population needs reconciliation between approximately 1,300 Hex paid accounts and the 938-account analysis, while 41% of seats are inactive. Enterprise discussions may begin near 35 seats or $30,000 annually, although the 1.5 million-events-per-user assumption remains unvalidated. Managed warehouse deployment is favored, with pricing-page updates, grandfathering, migration support, and sales training required. Ashley will retrieve 12-month Stripe billing data for validation. Competitive pricing research remains incomplete, and Elyse will investigate broader experiment tracking using Plausible data in the managed warehouse.\n\n## Keywords\nPro pricing, Event-based billing, Managed warehouse, Enterprise upsell, Customer segmentation, Plausible analytics\n\n## Action Items\n**Elyse Fox**\n- Model Pro pricing scenarios (00:00)\n- Validate event-volume assumptions (11:15)\n- Retrieve Pro pricing and usage data (13:31)\n- Produce 12-month pricing breakdown (15:36)\n- Review managed-warehouse usage (19:10)\n- Coordinate pricing implementation requirements (19:23)\n- Locate competitive pricing research (22:49)\n- Follow up with Dan and Logan (25:30)\n- Review login-page bandit variants (26:18)\n- Define Plausible data export approach (27:57)\n\n**Ashley Stirrup**\n- Add light-user segment (04:46)\n- Reconcile paid-account discrepancy (13:55)\n- Retrieve monthly pricing data (15:36)\n- Locate competitive pricing spreadsheet (22:49)\n\n**Unassigned**\n- Restrict Pro warehouse options (19:23)\n- Update Pro pricing pages (19:40)\n- Define customer grandfathering (19:45)\n- Create usage alerting (20:27)\n- Prepare Sales enablement (20:49)\n- Implement Product changes (20:57)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7RM1QQ2TAKFT51C9NDJ05X9",
+      "source": "fireflies",
+      "title": "Weekly 1:1 Elyse/Ashley",
+      "date": "2026-11-24",
+      "duration_minutes": 38.58000183105469,
+      "summary": "# Weekly 1:1 Elyse/Ashley\nDate: 2026-11-24 | Duration: 38.58000183105469m\n\n## Summary\nThe discussion covered a proposed usage-based pricing model, with usage below 5 million events free and conservative pricing potentially doubling overall; large and median experiment categories could rise by 150% and 278%. Enterprise thresholds remain open, with break-even near $30,000, a possible $50,000 floor, and $80,000 viewed as less acceptable. Bring Your Own Warehouse should remain available, especially since 74 Pro accounts selected it since May 2025, while Managed Warehouse is favored as the signup default. Managed Warehouse adoption appears to be about 33–34%, but the data needs validation in Hex. Analysis identified 439 BigQuery-heavy accounts, 61% of BigQuery accounts feeding GA4, and a potential no-code GA4-to-Managed-Warehouse path. CDN usage correlates with seats, while CDN spend has grown faster than seat MRR. Elyse will refine pricing options, competitor comparisons, usage segments, and outlier treatment before review with Ashley and Jeremy.\n\n## Keywords\nManaged warehouse, Bring-your-own warehouse, Usage-based pricing, GA4, BigQuery, Experiment pricing\n\n## Action Items\n**Elyse Fox**\nShare pricing analysis deck (08:02)\nRecalculate warehouse adoption (10:26)\nValidate warehouse adoption in Hex (22:38)\nDocument CDN usage (32:05)\nEvaluate BYOW pricing options (34:29)\nRemove usage outliers (35:04)\nDevelop pricing proposals (35:19)\n\n**Jeremy**\nReview GA4 warehouse opportunity (34:05)\n\n**Ashley Stirrup**\nReview pricing analysis with Elyse (35:19)",
       "organizer": "ashley@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

@@ -1,7 +1,7 @@
 {
   "company": "Dimensions",
   "slug": "dimensions",
-  "last_etl_date": "2026-11-17T08:40:23.065357",
+  "last_etl_date": "2026-11-25T09:23:09.887644",
   "calls": [
     {
       "id": "01M7DVRFFKZC88QH08C8FF97J8",
@@ -12,6 +12,17 @@
       "summary": "# Dimensions\nDate: 2026-11-16 | Duration: 42.90999984741211m\n\n## Summary\nAnthropic wants faster and simpler dimension breakdowns, along with automated detection of heterogeneous effects, because the existing user experience feels clunky and slow. The proposed product model separates dimension configuration from results presentation. Dimensions include exposure and standalone types, while precomputation is constrained by multiplicative cardinality and requires opt-in controls; Managed Warehouse precomputation remains uncertain. Interesting results may be identified through heuristics or thresholds, then shown through ranked drilldowns in the results interface and exposed through the API. Michael leads configuration and build work, Gabe partners on UI concepts, Lillia supports API work, and Luke will share configuration thoughts today. Sources: request scope at 00:50–07:10, product direction at 12:44–13:19, dimension architecture at 18:03–24:51, and delivery alignment at 29:55–39:26.\n\n## Keywords\nDimension precomputation, Automated heterogeneous treatment effects, EAQ configuration, Surprising slices, Results API, Experiment breakdowns\n\n## Action Items\n**Lillia Jackson**\nCollaborate on results API design (30:25)\nCollect Anthropic API questions (35:14)\n\n**Adriel Vieira**\nAssist results API work (30:25)\n\n**Unassigned**\nPrepare project direction (34:18)\nIdentify displaced work (39:26)\n\n**Luke Sonnet**\nDevelop dimension configuration approach (37:00)\nSend UI thoughts to Gabe (37:41)\nResearch automated dimension analysis (38:13)\nDiscuss results API design (39:26)\n\n**Gabe Melean**\nDevelop results UI concepts (37:41)\nExplore automated analysis approaches (37:41)\n\n**Michael Samper**\nReview EAQ dimension configuration (39:26)",
       "organizer": "gabe@growthbook.io",
       "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M85JEMQ7EEVZ38BBPQT435TF",
+      "source": "fireflies",
+      "title": "Dimensions",
+      "date": "2026-11-24",
+      "duration_minutes": 35,
+      "summary": "# Dimensions\nDate: 2026-11-24 | Duration: 35m\n\n## Summary\nThe discussion prioritized dimension setup and discovery as a prerequisite for precomputation, while an Anthropics request remains blocked. The proposed combined dimensions table would support assignment-query filtering and per-dimension precomputation, with expensive selections flagged. The first version is narrowed to precompute controls, post-stratification settings, and SQL dimension flow. Because precomputed state is absent from the data, API routes and core model changes are needed, while settings remain data-source-specific and cross-source configuration stays separate. Assignment-query editing is deferred because of cache invalidation risks, pending safer validation. Configuration can feed the Signals pipeline in parallel, but All Results remains the initial tab; Signals are optional initially and Highlights will come later. Signals still have edge cases, including unresolved two-variation behavior, and Luke will finalize the definition while Lillia creates an async channel. Michael is available for configuration work, Lillia will review it and later support Signals, and Luke owns pipeline implementation and priority. A December 10 target was discussed, with holiday-week capacity risk.\n\n## Keywords\nDimension configuration, Precomputation, Assignment queries, Post-stratification, Signals, Data sources\n\n## Action Items\n**Michael Samper**\nReview dimensions design (31:05)\nBuild configuration flow (31:05)\n\n**Lillia Jackson**\nCreate Signals channel (32:16)\n\n**Luke Sonnet**\nContinue pipeline implementation (31:46)\nPrioritise Signals work (31:46)\nFinalise Signals specification (32:26)\nShare Signals specification (32:26)\n\n**Gabe Melean**\nClean up dimension designs (32:33)",
+      "organizer": "gabe@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

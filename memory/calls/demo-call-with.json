@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-11-24T10:33:16.311829",
+  "last_etl_date": "2026-11-25T09:23:09.883464",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1357,6 +1357,28 @@
       "summary": "# Demo Call with Edouard Gouilliard from Mainloop AI\nDate: 2026-11-23 | Duration: 9m\n\n## Summary\nNo summary available",
       "organizer": "scott.keller@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M87GJB60B29N9RYC0DT78N24",
+      "source": "fireflies",
+      "title": "Demo Call with Boutaina Stitou from Talent.com",
+      "date": "2026-11-24",
+      "duration_minutes": 29,
+      "summary": "# Demo Call with Boutaina Stitou from Talent.com\nDate: 2026-11-24 | Duration: 29m\n\n## Summary\nTalent is reviewing experimentation platforms because changing business needs and a workforce reduction have altered its requirements, although Statsig remains stable and its support has been good. The product team is expected to operate the platform, with five likely users and six as the maximum, running about 15 experiments monthly and handling approximately 500 million daily exposures. GrowthBook presented feature flags, experimentation, product analytics, Redshift integration, warehouse-native architecture, cloud deployment, enterprise controls, and dedicated support options. Pro pricing was stated at $40 per user with email support and a one-business-day SLA, while Enterprise pricing includes a $30,000–$50,000 annual platform fee and averages approximately $50,000 annually. Boutaina Stitou indicated that spending under $20,000 annually would fit the expected budget, making Pro the more likely starting point. GrowthBook offered a 30-day Enterprise trial, migration support from Statsig, and help defining proof-of-concept success criteria. Pricing is needed before year-end, with a possible transition from Statsig planned for February or March 2027.\n\n## Keywords\nGrowthBook, Statsig migration, Experimentation platform, AWS Redshift, Enterprise pricing, Feature flags\n\n## Action Items\n**Boutaina Stitou**\nCreate GrowthBook Starter account (21:33)\nRequest Enterprise trial conversion (21:33)\nEvaluate GrowthBook (21:33)\nSend Scott Keller account update (27:02)\nSelect experimentation platform (27:52)\n\n**Scott Keller**\nProvide GrowthBook pricing (19:03)\nProvide Enterprise trial (21:33)\nSend meeting follow-up materials (27:07)",
+      "organizer": "scott.keller@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7NCYTDRHPJQM50QSV2PSFA5",
+      "source": "fireflies",
+      "title": "Demo Call with Michael Carlisle from Paleovalley",
+      "date": "2026-11-24",
+      "duration_minutes": 32.630001068115234,
+      "summary": "# Demo Call with Michael Carlisle from Paleovalley\nDate: 2026-11-24 | Duration: 32.630001068115234m\n\n## Summary\nWild Pastures evaluated GrowthBook as a lower-cost alternative for A/B and multivariate testing because VWO economics were difficult to justify, while future testing volume is expected to grow beyond its historical one to two tests every two weeks. The evaluation emphasized simple reporting without requiring a customer-managed warehouse; GrowthBook Managed Service provides hosted ClickHouse infrastructure, and GA4 was identified as the simplest initial data source because direct Mixpanel integration typically requires warehouse forwarding. GrowthBook supports feature flags, visual-editor tests, URL redirects, code injection, funnel and revenue metrics, Bayesian and Frequentist analysis, CUPED, saved audiences, and AI-assisted experiment evaluation. Pro was recommended because visual-editor access is paid, although its 2-million-event allowance compares with approximately 2.5 million current monthly events, with additional usage discussed at $30 per million. Redirect flicker remains an open technical concern, and follow-up documentation on performance, GA4 setup, SDK deployment, and implementation was promised. No purchase or implementation decision was made.\n\n## Keywords\nGrowthBook Managed Service, GA4 experimentation, Visual Editor testing, URL redirect testing, Feature flags, Personalisation audiences\n\n## Action Items\n**Dan Wathne**\nSend GA4 integration documentation (09:38)\nSend Visual Editor documentation (18:27)\nProvide redirect-test performance context (19:56)\nSend product demonstration recap (30:23)\nSend product demonstration recording (30:23)",
+      "organizer": "dan@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

@@ -1,0 +1,18 @@
+{
+  "company": "Growthbook <> Goes",
+  "slug": "growthbook-goes",
+  "last_etl_date": "2026-11-25T09:23:09.880947",
+  "calls": [
+    {
+      "id": "01M82HQWNRK1KB234JQABEGQQ5",
+      "source": "fireflies",
+      "title": "Growthbook <> Goes - Intro",
+      "date": "2026-11-24",
+      "duration_minutes": 67.5,
+      "summary": "# Growthbook <> Goes - Intro\nDate: 2026-11-24 | Duration: 67.5m\n\n## Summary\nGrowthBook was invited to support a government digitalization program covering health, education, and natural-disaster ecosystems. The central challenge is manual production deployment, which creates country-wide rollback risks when failures occur. Feature flags, staged rollouts, canary releases, comparisons between feature versions, and rollback capabilities were discussed as ways to reduce exposure and measure impact. Education was identified as the likely starting environment because it offers greater deployment control and faster iteration than health. GrowthBook also presented experimentation, analytics, governance, permissions, and feature-level impact measurement, distinguishing these capabilities from application-wide observability. Cloud and self-hosted deployment models remain under review, with self-hosting recommended for sensitive data and organizational separation. Adoption may begin with 30–40 developers or engineers and potentially expand to 120 users. Next steps include an early-next-week product demo, infrastructure review, and follow-up technical questions by email.\n\n## Keywords\nFeature flagging, A/B testing, Controlled releases, Self-hosted deployment, Government digitalisation, Product experimentation\n\n## Action Items\n**Dan Wathne**\nSend follow-up email (28:11)\nSchedule technical product demonstration (28:11)\nSend recommendation (35:08)\n\n**Unassigned**\nConsult infrastructure personnel (13:51)",
+      "organizer": "dan@growthbook.io",
+      "participants": 8,
+      "summary_quality": "good"
+    }
+  ]
+}

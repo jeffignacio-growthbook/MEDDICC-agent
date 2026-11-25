@@ -1,7 +1,7 @@
 {
   "company": "MrQ + GrowthBook",
   "slug": "mrq-growthbook",
-  "last_etl_date": "2026-11-17T08:40:23.071249",
+  "last_etl_date": "2026-11-25T09:23:09.890534",
   "calls": [
     {
       "id": "6aad5077c4d1e70014d29a94",
@@ -45,6 +45,17 @@
       "summary": "# MrQ + GrowthBook\nDate: 2026-11-16 | Duration: 29.6299991607666m\n\n## Summary\nThe team evaluated GrowthBook as a potential replacement for Amplitude across feature flagging, experimentation, product analytics, session replay, event streaming, heat maps, and funnels. GrowthBook’s self-hosting capability was considered a strong fit for Mr. Q’s security and infrastructure preferences, although separate storage and event-query costs could reduce the financial benefit. Enterprise capabilities are required for self-hosting, single sign-on, audit logs, custom roles, and approval workflows, while the Pro plan’s 30-user limit may not support expected usage of 20 to 40 users. Proposed annual pricing was $175K for the self-hosted platform, $225K for 40 users, and $200K for 50 experiments. Budget approval is the main blocker because spending above $100K receives CFO scrutiny. A discount estimate was requested before budget discussions. If commercial alignment is reached, a four-to-six-week POC would compare parallel GrowthBook and Amplitude experiments. A follow-up was proposed for Tuesday the 24th at 3:30 PM UK time to review pricing, customer examples, POC scope, and timing.\n\n## Keywords\nGrowthBook, Amplitude replacement, Self-hosting, Experimentation platform, Product analytics, Pricing negotiation\n\n## Action Items\n**Christian Liebenow**\nShare pricing and business-value materials (13:59)\nProvide rough discount estimate (19:49)\nPrepare one-year GrowthBook proposal (24:42)\nSend follow-up calendar invitation (27:32)\n\n**Alejandro Lizaguilera**\nPresent GrowthBook pricing to CFO (19:49)\nRun GrowthBook proof of concept (20:36)\nInvite CPO to pricing review (24:42)",
       "organizer": "christian@growthbook.io",
       "participants": 4,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7QTYKH46FGK6297Z0X28G8F",
+      "source": "fireflies",
+      "title": "MrQ + GrowthBook",
+      "date": "2026-11-24",
+      "duration_minutes": 4.639999866485596,
+      "summary": "# MrQ + GrowthBook\nDate: 2026-11-24 | Duration: 4.639999866485596m\n\n## Summary\nNo summary available",
+      "organizer": "christian@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

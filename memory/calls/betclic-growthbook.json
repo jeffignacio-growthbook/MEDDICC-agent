@@ -1,7 +1,7 @@
 {
   "company": "BetClic & GrowthBook",
   "slug": "betclic-growthbook",
-  "last_etl_date": "2026-11-19T08:09:43.866064",
+  "last_etl_date": "2026-11-25T09:23:09.891065",
   "calls": [
     {
       "id": "01M5YA9DP2BJ62RV9PW8RRBBRP",
@@ -23,6 +23,17 @@
       "summary": "# BetClic & GrowthBook DS Session\nDate: 2026-11-18 | Duration: 40m\n\n## Summary\nGrowthBook’s open-source version was tested locally by Klaus Fleerkötter with successful initial results, and its current architecture is viewed as a possible path for advancing experimentation. The preferred model uses GrowthBook as an analysis layer on Snowflake while retaining BetClic’s existing attribution layer, SDKs, impression data, and analyst workflows. A standalone exposure-assignment query would define experiment populations, variants, and exposure timestamps, while template variables could support experiment-specific event filtering. Time-windowed metrics, concurrent experimentation, sequential testing, and configurable minimum durations were discussed as safeguards for reliable analysis. BetClic’s sports betting, casino, poker, and horse products are mostly isolated, although some cross-universe activity exists; interaction effects are not expected to commonly prevent concurrent testing. Vendor evaluation will continue for approximately two weeks. January timing remains unconfirmed because IT and other teams have competing priorities. Edouard will provide further RFP details and a clearer implementation plan, while James Shannon will arrange a commercial discussion covering pricing and planning.\n\n## Keywords\nExperimentation analysis, Snowflake, Exposure attribution, Sequential testing, Parallel experiments, Cluster randomisation\n\n## Action Items\n**Klaus Fleerkötter**\nPresent proposed GrowthBook architecture (06:27)\n\n**Edouard**\nEvaluate GrowthBook vendor responses (26:10)\nSend implementation planning update (26:52)\nProvide UAP extract details (28:28)\n\n**James Shannon**\nPresent commercial model and pricing (29:05)\nSend calendar placeholder (29:48)",
       "organizer": "james.shannon@growthbook.io",
       "participants": 9,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M825HXBSW7SMHY18XFW0NEYA",
+      "source": "fireflies",
+      "title": "BetClic & GrowthBook Commercial Discussion",
+      "date": "2026-11-24",
+      "duration_minutes": 41.939998626708984,
+      "summary": "# BetClic & GrowthBook Commercial Discussion\nDate: 2026-11-24 | Duration: 41.939998626708984m\n\n## Summary\nGrowthBook presented an enterprise proposal covering a $100,000 base license, $1,000 per seat annually, and an example $300,000 total for 200 seats, with possible volume discounts. The value model included revenue lift, avoided losses, and analyst-time savings, with an illustrative $9.85 million combined annual benefit and $5.4 million net revenue impact. The customer targets 50–100 tests per quarter and views GrowthBook as a strong functional fit, although competitors are priced lower. Self-hosting in AWS is the preferred deployment because cloud hosting may require review of personally identifiable login data and EU data-transfer issues; functionality and statistical capability are stated to be equivalent. MongoDB Atlas, AWS ECS, and Snowflake are expected to support the environment. Hosting was estimated at $2,000–$4,000 annually, while Snowflake usage may approach $5,000 monthly, with optimization potentially reducing comparable costs by 80%. RFP evaluation continues this week, with clearer internal direction expected within approximately two weeks. A two-to-four-week self-hosted POC may follow legal, procurement, and vendor-selection approval.\n\n## Keywords\nGrowthBook enterprise licensing, Self-hosted deployment, Experimentation platform, Snowflake optimisation, Proof of concept, A/B testing analytics\n\n## Action Items\n**James Shannon**\nSend BetClic commercial proposal slides (04:27)\nDocument cloud and self-hosted parity (17:40)\nProvide infrastructure guidance and cost estimates (26:37)\nProvide Snowflake cost range (26:37)\nSend BetClic commercial ideas (37:27)\nArrange BetClic follow-up discussion (37:27)\n\n**Edouard Thomas**\nReview RFP (05:33)\nShare proposal and commercial information (36:26)\nProvide internal planning update (37:20)\n\n**BetClic team**\nReview POC timing (36:26)\nDecide whether to proceed with POC (36:26)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]

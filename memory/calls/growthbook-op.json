@@ -1,7 +1,7 @@
 {
   "company": "GrowthBook + Op",
   "slug": "growthbook-op",
-  "last_etl_date": "2026-11-20T07:53:33.053496",
+  "last_etl_date": "2026-11-25T09:23:09.889718",
   "calls": [
     {
       "id": "01KT7DMS83RXCGY1RPYJB8XGY3",
@@ -139,6 +139,17 @@
       "date": "2026-11-17",
       "duration_minutes": 29,
       "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-11-17 | Duration: 29m\n\n## Summary\nThe MQL workflow is live: contacts crossing the engagement threshold receive MQL status, lifecycle updates, threshold details, and account-fit tier lists. Account scoring will precede contact scoring, using Rio activity, de-anonymized developers and buyers, with open-source use and plan signups considered for contacts. Hand-picked contacts will help identify missing signals, decay effects, and weighting gaps. The proposed automation uses nightly Claude processing, Zapier transfer, and HubSpot updates, while storage in Google Cloud, Google Sheets, or Zapier Tables remains undecided. Sales alerts, ownership filters, assignment, and follow-up tracking still need agreement. License automation now syncs the highest active license to company records, but organization-ID matching and duplicate records remain issues. Customer lifecycle automation, active Pro and Starter segmentation, parent-child cleanup, and formal MQL operating procedures are still in progress. Michael and Deb cover Shawn’s leave.\n\n## Keywords\nLead scoring, Claude integration, Rio segments, HubSpot automation, MQL routing, Licence synchronisation\n\n## Action Items\n**Jeff Ignacio**\nBuild Claude-based account-scoring routine (16:29)\nCoordinate integration working session (17:10)\n\n**Chris Newton**\nCreate HubSpot scoring segment (19:28)\nDesign MQL routing process (28:36)\n\n**Michael Funduc**\nBuild HubSpot scoring workflow (18:34)\nMonitor licence synchronisation (25:46)\n\n**Shawn Green**\nRefine licence synchronisation automation (25:46)\n\n**Jacqueline Thomson**\nReview parent-child account records (26:39)",
+      "organizer": "ryan.mcgurk@growthbook.io",
+      "participants": 10,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7RM1QQHBTYTKJ96APNP51Z7",
+      "source": "fireflies",
+      "title": "GrowthBook + Op Methods Weekly Check-In",
+      "date": "2026-11-24",
+      "duration_minutes": 20,
+      "summary": "# GrowthBook + Op Methods Weekly Check-In\nDate: 2026-11-24 | Duration: 20m\n\n## Summary\nThe discussion covered duplicate telemetry created when GrowthBook hosted-app URLs moved through Rio into HubSpot, especially across different domains. The telemetry sync was paused after a large surge on November 18 and 19 while Rio and GrowthBook review fuzzy matching, upstream filtering, and URL handling. A direct Rio-to-HubSpot integration is writing four of six fields—active developers, de-anonymized developers, de-anonymized buyers, and last updated date—to about 10 companies, with staged expansion planned. Lead scoring is waiting for broader data. About 2,900 accounts created since November 18 have no contacts or activity, while 127 may match existing HubSpot companies; Michael will send lists to Lyndsie for review. The segment excludes customers and targets companies with at least 250 employees. Counts remain unresolved because HubSpot showed roughly 3,000 accounts while Rio showed seven. Michael will compare segments, and Chris will follow up with Jeff about MQL assignment.\n\n## Keywords\nRio-to-HubSpot sync, Telemetry data, Duplicate accounts, URL matching, Lead scoring, De-anonymised contacts\n\n## Action Items\n**Lyndsie Berens**\nConnect with Ashley Stirrup (01:57)\nReview duplicate-company list (07:13)\nShare segment views with Michael Funduc (18:57)\n\n**Ashley Stirrup**\nDisable affected Rio sync (05:44)\n\n**Michael Funduc**\nCheck Rio rollout status (06:27)\nSend duplicate-account lists to Lyndsie Berens (07:13)\nCompare Rio and HubSpot segment counts (16:00)\n\n**Chris Newton**\nFollow up with Jeff (19:29)",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 10,
       "summary_quality": "good"

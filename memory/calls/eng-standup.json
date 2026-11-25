@@ -1,7 +1,7 @@
 {
   "company": "Eng Standup",
   "slug": "eng-standup",
-  "last_etl_date": "2026-11-18T08:02:54.657342",
+  "last_etl_date": "2026-11-25T09:23:09.888395",
   "calls": [
     {
       "id": "01KGJ8WY3PJ95HVBNJFF68YKB0",
@@ -374,6 +374,17 @@
       "duration_minutes": 29.100000381469727,
       "summary": "# Eng Standup\nDate: 2026-11-17 | Duration: 29.100000381469727m\n\n## Summary\nSecurity discussions focused on an Optimizely attack that exposed customer sites to malware injection, credit-card extraction, and session-cookie theft risks, with a likely employee-account compromise and CDN compromise considered. Proposed safeguards included organization-level Visual Editor disablement, SDK-level execution blocking, payload-injection prevention, and reviewing opt-in defaults. Product quality efforts included weekly 15-minute dogfooding sessions, prioritizing tiny fixes, involving Design, and improving the prelaunch checklist. Experimentation work covered an active feature redesign A/B test, validated organization-level cluster assignment with user-level analysis, organization SRM as the primary check with a five-percent imbalance threshold, and automated dimension-slice results with multiple-comparison safeguards. Product workstreams advanced the SDK connection redesign, feature diagnostics, onboarding imports, and trace ingestion. Delivery updates included a near-complete Terraform provider and CLI, final testing for the Kafka AWS migration, an enterprise patch with around thirty fixes, and billing and identifier cleanup.\n\n## Keywords\nVisual Editor security, SDK safeguards, Cluster experiments, Product dogfooding, Trace ingestion, Experiment analytics\n\n## Action Items\n**Jeremy Dorn**\n- Add organisation settings (02:40)\n- Add SDK controls (03:13)\n- Verify SDK defaults (05:51)\n- Review SDK checking (06:15)\n- Coordinate walkthroughs (07:29)\n- Clean up identifiers (20:32)\n\n**Bryce Fitzsimons**\n- Resolve metric tracking (09:10)\n- Complete SDK redesign (15:25)\n- Add SDK hooks (15:25)\n\n**Luke Sonnet**\n- Link health-check findings (11:41)\n- Improve analysis pipeline (23:08)\n- Explore dimension slices (23:38)\n- Prepare Anthropic mock-up (24:16)\n\n**Andy**\n- Define diagnostics MVP (16:03)\n\n**Guy Langford-lee**\n- Advance onboarding (16:36)\n- Complete approval-flow review (19:29)\n\n**Omar Elshaikh**\n- Deploy trace instrumentation (17:28)\n\n**Michael Silver**\n- Complete payment-failure handling (20:32)\n\n**Kevin**\n- Complete Terraform provider (25:20)\n\n**Dan**\n- Test Kafka migration (26:11)",
       "organizer": "alyssa@growthbook.io",
+      "participants": 28,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M879RDC26NNNW30N1S3SFQAP",
+      "source": "fireflies",
+      "title": "Eng Standup",
+      "date": "2026-11-24",
+      "duration_minutes": 1,
+      "summary": "# Eng Standup\nDate: 2026-11-24 | Duration: 1m\n\n## Summary\nNo summary available",
+      "organizer": "johnny@growthbook.io",
       "participants": 28,
       "summary_quality": "good"
     }

@@ -1,0 +1,18 @@
+{
+  "company": "Graham McNicoll and",
+  "slug": "graham-mcnicoll-and",
+  "last_etl_date": "2026-11-25T09:23:09.890223",
+  "calls": [
+    {
+      "id": "01M82MKFQP2AZF2BDC9C7R3XQC",
+      "source": "fireflies",
+      "title": "Graham McNicoll and Daphne Zuckerman + Owen Worchell",
+      "date": "2026-11-24",
+      "duration_minutes": 13.760000228881836,
+      "summary": "# Graham McNicoll and Daphne Zuckerman + Owen Worchell\nDate: 2026-11-24 | Duration: 13.760000228881836m\n\n## Summary\nThe discussion addressed several communications and logistics issues. Repeated closing announcements used nearly identical email language, so variation was needed; Daphne had added a team quote to a recent announcement, and an investment-team list was available for distribution support. Daphne also had Sheamus proofread an announcement three times, reflecting pressure around closing communications. A date discrepancy required clarification because the email referenced the 25th while an earlier understanding may have indicated another date; Daphne and Owen planned to verify the timing. Daphne expected to go offline the next day, while Owen hoped to disconnect after his final call, though neither timing was fixed. Owen also needed to adjust Teams audio, determine how to disable notifications, and purchase a replacement or additional charger. Separately, Owen described Michigan’s newly hired athletic director as being fired before starting and said Michigan owed that person $17 million. He also noted a 9% decline in Nvidia stock.\n\n## Keywords\nFriendsgiving, Closing announcements, Microsoft Teams notifications, Computer charger, Michigan athletics, Nvidia\n\n## Action Items\n**Owen Worchell**\nPurchase computer charger (11:14)\nDisable Microsoft Teams notifications (11:44)",
+      "organizer": "graham@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

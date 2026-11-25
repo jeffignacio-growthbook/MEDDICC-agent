@@ -1,0 +1,18 @@
+{
+  "company": "BBC / GB",
+  "slug": "bbc-gb",
+  "last_etl_date": "2026-11-25T09:23:09.890822",
+  "calls": [
+    {
+      "id": "01M7R3ZR97Y9STKR4V6VJPN4HH",
+      "source": "fireflies",
+      "title": "BBC / GB",
+      "date": "2026-11-24",
+      "duration_minutes": 68.37000274658203,
+      "summary": "# BBC / GB\nDate: 2026-11-24 | Duration: 68.37000274658203m\n\n## Summary\nFeature flag discussions focused on experimentation, business checks, memory control, automatic handling, authorization, access considerations, and an exclusive visual editor for experimentation and feature configuration. Experiment analysis covered anti-spill control groups, experiment isolation, separating experiment scope from out-of-scope controls, analysis setup, and preserving metric sources with source tracking. Product analytics topics included session replay, the analytics product, timeline references for feature evaluation, and acceptance of an experimental feature. Integration topics mentioned Google, GitHub Copilot, and OpenAI. Evaluation tracking included an approval follow-up, while external attribute checks addressed internal names, external names, and checkspace attributes.\n\n## Keywords\nFeature flags, Experimentation, Control groups, Product analytics, Session replay, Experiment tracking\n\n## Action Items\n**Adrien LOISON**\nCombine Alafoa with feature flags (05:42)\nSet up data analysis (22:59)",
+      "organizer": "remy@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

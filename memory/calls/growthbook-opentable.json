@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook <> Opentable",
+  "company": "Growthbook <> OpenTable",
   "slug": "growthbook-opentable",
-  "last_etl_date": "2026-11-21T07:50:19.787963",
+  "last_etl_date": "2026-11-25T09:23:09.886843",
   "calls": [
     {
       "id": "69de6935c1f9eb0011fa27dc",
@@ -225,6 +225,17 @@
       "summary": "# Growthbook <> Opentable - Pricing Sync\nDate: 2026-11-20 | Duration: 21.600000381469727m\n\n## Summary\nThe discussion focused on shaping a commercial agreement and completing contracting. The preferred structure is 100 full seats in year one, with an option to upgrade early, followed by 200 full seats in year two; blended pricing and comparable one-year economics will also be considered. Floating read-only access was accepted, but broader occasional access remains the main commercial concern because sales users and other employees may need to view experiment results. The customer wants to avoid building an API-based experiment dashboard. Adoption sizing is unresolved: the organization includes approximately 150 engineers and 20–30 project managers and designers, but not all potential users are expected to need full access immediately. The platform fee remains separate from usage scaling, with seats serving as the scaling metric. Legal review of the MSA and related materials is substantially complete, leaving the order form as the main contracting step. A revised proposal is expected for review in the first week of December, the trial continues through the second week, and both sides aim to complete the partnership before year-end.\n\n## Keywords\nRead-only seats, Two-year contract, Seat-based pricing, Trial extension, Order form, Experimentation adoption\n\n## Action Items\n**Dan Wathne**\nBegin order-form process (16:29)\nCoordinate final joint call (18:15)\nPrepare commercial proposal (20:06)\n\n**Forrest Rice**\nReview GrowthBook proposal (17:18)",
       "organizer": "dan@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7QY4SVXGNYX3B4PNWG7X8X9",
+      "source": "fireflies",
+      "title": "Growthbook <> OpenTable - Weekly POC Sync",
+      "date": "2026-11-24",
+      "duration_minutes": 13.65999984741211,
+      "summary": "# Growthbook <> OpenTable - Weekly POC Sync\nDate: 2026-11-24 | Duration: 13.65999984741211m\n\n## Summary\nGrowthBook is moving toward final approval, with commercial discussions involving Forrest, Justin, and Anshul, but workflow, reporting, and statistical-analysis questions remain. The team prioritized automatically creating separate development and production experiments with correct environment configurations to prevent production rules or events from being misrouted to the production data lake. It also requested dashboards that group team-specific metrics and goals into focused reports. The power calculator was added to the evaluation scope because the current internal system lacks an equivalent capability; it can use a target population, selected metrics, power over time, and minimum detectable effect to support runtime planning. However, Logan noted that seasonality is not currently modeled, despite weekend patterns in restaurant reservations, bookings, and revenue. A past experiment or representative user segment may provide a better estimate. Dan will consolidate evaluation gaps, coordinate a broader working session for early next week, and share requirements with Saranya. The next session is intended to review the final checklist and support approval.\n\n## Keywords\nA/B testing, Experiment environments, Metric dashboards, Statistical power analysis, Seasonality, Minimum detectable effect\n\n## Action Items\n**Dan Wathne**\nArrange broader working session (05:14)\nCompile evaluation gaps (05:44)\nContact Saranya HV (05:44)\nRequest team availability (11:36)\n\n**Saranya HV**\nComplete evaluation-gap review (05:44)\nSend additional questions (11:24)",
+      "organizer": "dan@growthbook.io",
+      "participants": 10,
       "summary_quality": "good"
     }
   ]

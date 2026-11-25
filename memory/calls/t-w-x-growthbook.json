@@ -1,0 +1,18 @@
+{
+  "company": "T&W x GrowthBook",
+  "slug": "t-w-x-growthbook",
+  "last_etl_date": "2026-11-25T09:23:09.879897",
+  "calls": [
+    {
+      "id": "01M83KXBSJDK3JTWJNEP82JEAE",
+      "source": "fireflies",
+      "title": "T&W x GrowthBook | Review Commercials & Scenarios",
+      "date": "2026-11-25",
+      "duration_minutes": 37.83000183105469,
+      "summary": "# T&W x GrowthBook | Review Commercials & Scenarios\nDate: 2026-11-25 | Duration: 37.83000183105469m\n\n## Summary\nThe decision is primarily commercial: although the product is viewed favorably, budget is decisive and Optimizely is currently cheaper, requiring an approximately 30% reduction based on an earlier proposal whose assumptions are still changing. A two-year structure is being considered, but annual agreements remain preferred, so longer commitments must provide additional value. The comparison must cover the full replacement scope, including Optimizely capabilities, feature flags, security benefits, and additional products. User planning has narrowed from an earlier estimate of 80 to around 20 active users, with reporting readers and structured admin or restricted roles also required. Self-hosting addresses security concerns by keeping data within internal infrastructure, while BigQuery remains available; AI features are optional, can be disabled at the organization level, and may use customer-managed hosting or a self-hosted MCP option. The existing contract expires in April, with a year-end decision targeted and an overlap period expected. Feature flags can potentially be imported within a day, while experiment migration may take up to two weeks for a clean cutover or up to a month-and-a-half for a broader transition. David will provide commercial and product details, Marcel will send setup guidance, and a Friday progress discussion is planned.\n\n## Keywords\nOptimizely replacement, GrowthBook, Feature flags, Self-hosting, Experiment migration, Commercial proposal\n\n## Action Items\n**Marcel Geldner**\nAdd APAC customer references (05:17)\nSend POC checklist (21:41)\nShare commercial response points (35:16)\nArrange Friday progress discussion (34:36)\n\n**David Court**\nProvide Optimizely products list (12:30)\nConfirm commercial parameters (31:18)\nDiscuss self-hosting considerations (30:08)\nProvide migration information (31:58)\n\n**James Shannon**\nPrepare commercial scenarios (28:28)\nSend migration questions (32:29)\nArrange Friday progress discussion (34:36)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

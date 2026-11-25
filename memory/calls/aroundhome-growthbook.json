@@ -1,7 +1,7 @@
 {
   "company": "Aroundhome & GrowthBook",
   "slug": "aroundhome-growthbook",
-  "last_etl_date": "2026-09-25T05:35:27.959106",
+  "last_etl_date": "2026-11-25T09:23:09.891563",
   "calls": [
     {
       "id": "01M2QRE1JTC89CQV8S75V30802",
@@ -12,6 +12,17 @@
       "summary": "# Aroundhome & GrowthBook | Introduction Meeting\nDate: 2026-09-24 | Duration: 38.709999084472656m\n\n## Summary\nThe company is seeking a company-wide experimentation capability because it currently uses Unleash only for feature flags and relies on manual product-analytics analysis. Desired capabilities include experimentation across web, server-side, and mobile surfaces; persistent variant assignment; customer-attribute targeting; exposure tracking; multi-experiment management; and low-traffic support. Its environment includes TypeScript, Node, Ruby, Go, AWS Lambda at the CloudFront edge, Kubernetes on IPv6 ARM infrastructure, and an AWS S3 lakehouse queried with Athena. The company wants minimal transformation effort, Iceberg compatibility, and low integration cost. GrowthBook presented native warehouse integration, local SDK evaluation with rule caching, exposure events, feature flags, experiments, guardrail metrics, automated feature toggling, self-hosting or cloud hosting, EU availability, GDPR, SSO, and SAML. Pricing includes a platform fee and $1,000 per user annually, with unlimited experiments and feature flags and no traffic-based fees. Next steps include sharing pricing and documentation, reviewing caching performance and integration costs, and evaluating a proof of concept before a decision planned within two months.\n\n## Keywords\nExperimentation, Data Lakehouse, Feature Flagging, AWS Athena, Proof of Concept, Pricing Model\n\n## Action Items\n**Rémy Marin**  \nProvide technical documentation on AWS Athena integration (29:32)  \nFollow up with technical effort and cost comparisons for GrowthBook integration (30:30)  \nSend links and examples of POC processes and checklists (36:19)  \n\n**Marcel Geldner**  \nShare POC agenda and documentation (36:19)  \nSend detailed platform pricing list to Around Home team (36:52)  \n\n**Trupti Karnire**  \nCoordinate potential follow-up call (36:28)  \n\n**Bita Motamedian**  \nReview pricing and technical details and determine next steps (36:35)",
       "organizer": "marcel@growthbook.io",
       "participants": 8,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M849B62EDXJW68VQYGM3EX70",
+      "source": "fireflies",
+      "title": "Aroundhome & GrowthBook | Sync on Status",
+      "date": "2026-11-24",
+      "duration_minutes": 20.709999084472656,
+      "summary": "# Aroundhome & GrowthBook | Sync on Status\nDate: 2026-11-24 | Duration: 20.709999084472656m\n\n## Summary\nPricing was clarified at 40k annually for 10 licenses or 50k for 30, while the internal budget target remains 30k. Unlicensed users cannot access the information, and additional licenses increase the total cost. Current rates are valid through January 31, with possible changes in February as the new fiscal year begins. A one-month POC will replace an immediate contract, include full vendor support, and preserve the option to opt out; its agreement must be signed this year, with testing likely starting in the second week of January and a full contract targeted by January end. Cost approval is being reviewed by the CTPO, engineering director, and investors, while GrowthBook, other vendors, and an in-house option remain under consideration. A decision update is expected Thursday. Data engineering effort still requires validation, and Rohini may support setup, including possible SDK work. Remy and the vendor support team will assist during the POC through a Slack channel.\n\n## Keywords\nGrowthBook pricing, POC agreement, License packages, Budget approval, Implementation effort, Vendor evaluation\n\n## Action Items\n**Marcel Geldner**\nProvide POC support resources (09:58)\nSummarize meeting notes (18:44)\n\n**Trupti Karnire**\nReview GrowthBook pricing (12:01)\nConsult budget approvers (13:34)\nCheck budget approval status (14:08)\nConsult data engineering lead (14:59)\nArrange technical questions call (15:52)\nConsult principal architect (18:59)\nSend GrowthBook status update (18:15)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 2,
       "summary_quality": "good"
     }
   ]
