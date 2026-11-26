@@ -1,0 +1,18 @@
+{
+  "company": "AdsWizz + GrowthBook",
+  "slug": "adswizz-growthbook",
+  "last_etl_date": "2026-11-26T09:01:12.525627",
+  "calls": [
+    {
+      "id": "01M73CCHQ21Q8169X5NWQ1SDJY",
+      "source": "fireflies",
+      "title": "AdsWizz + GrowthBook",
+      "date": "2026-11-25",
+      "duration_minutes": 52.5099983215332,
+      "summary": "# AdsWizz + GrowthBook\nDate: 2026-11-25 | Duration: 52.5099983215332m\n\n## Summary\nAdWizz and GrowthBook defined a POC sequence beginning with an AA test to validate metric definitions, exposure logs, integration, and equivalent control and variant behavior, followed by a parallel-demand yield experiment. The initial AdWizz MVP will compare parallel demand calls across pre-roll, post-roll, and mid-roll placements, focusing on revenue, fill rates, pricing priority, and timeout reduction. The first four or five experiments are expected to address yield optimization, with later scope potentially covering thresholds, pacing, demand, and bid-price optimization. AdWizz plans to self-host GrowthBook for security and capacity control, while testing scale early because ad-request experimentation may involve billions of events and larger joins. Pipeline mode may reduce Snowflake workload, but Iceberg support remains unresolved. Namespaces, targeting, rollout controls, guardrails, alerts, and shutdown mechanisms were reviewed. Open items include exposure-phase logging, hashing documentation, enterprise pricing flexibility, value framing, and a follow-up after AWS re:Invent.\n\n## Keywords\nGrowthBook self-hosting, AA testing, Yield optimisation, Experiment namespaces, Snowflake and Iceberg, Experiment guardrails\n\n## Action Items\n**Mihai Pantelimon**\nSend AA-test wiring details to GrowthBook (07:36)\n\n**AdsWizz Product Analytics Team**\nReview AA-test design (07:36)\n\n**Logan Bates**\nSend interleaving-testing documentation to AdsWizz (17:01)\nValidate experiment hashing behavior (40:17)\nPass hashing language feedback to GrowthBook UI team (41:49)\nInvestigate phase-index exposure logs (44:08)\nVerify pipeline mode storage compatibility (46:28)\n\n**Isaac Hill**\nShare pricing flexibility discussion with Drew Moncelle (48:35)\n\n**Christian Liebenow**\nSend follow-up email and documentation links to AdsWizz (50:42)\nCoordinate next commercial and technical discussion with Drew Moncelle (50:42)",
+      "organizer": "christian@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "AirOps Planning",
   "slug": "airops-planning",
-  "last_etl_date": "2026-11-19T08:09:43.861832",
+  "last_etl_date": "2026-11-26T09:01:12.524226",
   "calls": [
     {
       "id": "01KJXC5337E7411SK81AZFNK3P",
@@ -199,6 +199,17 @@
       "date": "2026-11-18",
       "duration_minutes": 71,
       "summary": "# AirOps Planning\nDate: 2026-11-18 | Duration: 71m\n\n## Summary\nThe discussion covered security communications, website FAQs, measurement, AI visibility, content, SEO, research, and near-term execution. Security work includes leading the newsletter with Jeremy’s timely blogs, expanding practical FAQs across relevant pages, and avoiding absolute security claims while addressing visual-editor protections, self-hosting, and API-key safety. Measurement priorities include demo requests, free-product signups, registration completion, new-versus-returning users, traffic sources, and AI visibility, with Ashley Stirrup’s spreadsheet serving as the reporting location. Athena tracking should initially focus on approximately 15–20 high-value commercial prompts, add middle-funnel questions, and incorporate feature-flagging use cases and product-update insights. Content work includes reviewing four high-impression, low-click Insights pages, evaluating blog migrations, developing interleaving content, and creating experimentation thought leadership. Near-term actions include FAQ placement, Plausible tracking, SEO review, signup measurement, reporting improvements, and product-update workflows.\n\n## Keywords\nSecurity FAQs, Plausible analytics, AI search visibility, Athena prompt tracking, Feature-flag content, SEO conversion optimisation\n\n## Action Items\n**Jack Virag**\nForward Jeremy’s security blog and supporting materials (00:00)\nIdentify site pages for security FAQs (07:49)\nRewrite security recommendations into FAQ format (10:16)\nReview underperforming Insights articles (59:04)\nContact Michael Knowlton about signup tracking (59:08)\nCoordinate Plausible tracking implementation (59:08)\n\n**Jason Faber**\nCompile security questions and prompts (05:05)\nDefine weekly reporting metrics and reference view (14:10)\nReview SEO and content topics (59:56)\nDevelop product update and AI prompt process (01:00:06)\n\n**Karen Henke**\nPrepare security FAQ notes (08:16)\nAdd Plausible tracking requirements to website plan (14:54)\nDevelop homepage tracking in Plausible (17:09)\nDevelop pricing-page tracking in Plausible (17:09)\nExpand middle-of-funnel AI prompt ideas (24:24)\n\n**Emmy Sharp**\nAsk onboarding interviewees about security (34:08)\n\n**Ashley Stirrup**\nAdd new-versus-returning users to reporting view (46:21)\nShare proposed content topics with Jason Faber (59:56)",
+      "organizer": "ashley@growthbook.io",
+      "participants": 7,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7P1ZV2N0N64HX8VESJE98WZ",
+      "source": "fireflies",
+      "title": "AirOps Planning",
+      "date": "2026-11-25",
+      "duration_minutes": 41.59000015258789,
+      "summary": "# AirOps Planning\nDate: 2026-11-25 | Duration: 41.59000015258789m\n\n## Summary\nThe discussion covered Plausible analytics, agent marketing, search visibility, content operations, and experimentation and security. Plausible setup progressed, with 45 conversions recorded in the week of the 16th, but page categorization and reporting views still need refinement. Newsletter subscribers rose from 66 to 72, with the homepage as the main signup source and the blog generating 16 signups. Agent content expanded, although the conversion funnel, Athena feature flags, repository discoverability, and adoption tracking remain unresolved. Agent guides have limited traffic, making internal linking and clearer promotion immediate priorities. The team also discussed a repeatable SEO handoff, four possible December articles, next-year planning, content comparing client-side, server-side, and edge testing, and a review of GrowthBook’s security positioning.\n\n## Keywords\nPlausible analytics, Agent feature flags, SEO documentation, GEM content review, Client-side testing, Server-side testing\n\n## Action Items\n**Jack Virag**\nBuild Plausible analytics funnel (02:30)\nPublish employee-written posts (07:14)\nContinue V Team and Optimisely initiatives (07:14)\nObtain G2 access (07:14)\nConduct website linking sweep (20:59)\nAsk Jeremy for client-side testing perspective (36:37)\n\n**Jason**\nAdd agent feature flags to Athena (08:17)\n\n**Emmy Sharp**\nContact Jason about SEO workflow (23:15)\n\n**Ashley Stirrup**\nReview GEM article outputs (24:08)\nCheck onboarding meeting availability (39:22)\n\n**Jeremy Dorn**\nWrite client-side testing article (36:37)",
       "organizer": "ashley@growthbook.io",
       "participants": 7,
       "summary_quality": "good"

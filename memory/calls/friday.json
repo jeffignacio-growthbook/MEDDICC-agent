@@ -1,7 +1,7 @@
 {
   "company": "Friday",
   "slug": "friday",
-  "last_etl_date": "2026-11-18T08:02:54.653911",
+  "last_etl_date": "2026-11-26T09:01:12.525134",
   "calls": [
     {
       "id": "01M509E060V0SHK6BQ3MPXPFXE",
@@ -54,6 +54,17 @@
       "date": "2026-11-17",
       "duration_minutes": 24.350000381469727,
       "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-11-17 | Duration: 24.350000381469727m\n\n## Summary\nOutreach shifted toward near-term AWS re:Invent and Optimizely displacement campaigns after existing sequences were paused because of daily email-sending limits. Two meetings had been created by Tuesday, with recent meetings involving All Four Sports, WooClap, and StatScore, while Delivery Hero came from the prior week. The team identified a hidden OSS filter that excluded accounts below 250 employees and planned a separate segment, initially targeting 51–100 employee companies in the US and Europe with high website traffic. Jake was expected to complete the sub-250 segment by end of day, pursue early wins, and potentially expand coverage later. Reporting was improved by separating created and close months, excluding Demo Request opportunities, and correcting BDR ownership; July was the strongest opportunity-creation month, with projected pipeline in December and January. Optimizely messaging should remain tactful and address broader reasons for platform changes. Brent could support website-traffic enrichment, and the next meeting was scheduled for Wednesday at 2:00 Eastern.\n\n## Keywords\nOSS segmentation, AWS re:Invent outreach, Optimizely takeout, Pipeline reporting, BDR productivity, Outbound prospecting\n\n## Action Items\n**Jake Stangl**\nCreate separate OSS segment (02:10)\nPrioritize AWS re:Invent outreach (12:56)\nRun Optimizely takeout campaign (13:38)\nTarget OSS companies (16:25)\nSend Brent target company list (17:22)\nAssign Jake as BDR owner (20:35)\n\n**Brent Holloway**\nEnrich OSS company list (17:35)\nHold next meeting Wednesday (22:51)\nCancel Thursday meeting (22:51)",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M84YRDGPC6C7YPTDBXM6VM9K",
+      "source": "fireflies",
+      "title": "Jake <> Brent weekly 1:1 (Friday)",
+      "date": "2026-11-25",
+      "duration_minutes": 28.90999984741211,
+      "summary": "# Jake <> Brent weekly 1:1 (Friday)\nDate: 2026-11-25 | Duration: 28.90999984741211m\n\n## Summary\nSales activity was strong, with six leads created through open-source and Pro-to-Enterprise campaigns, while automated LinkedIn or email sequences continued generating meetings. The team reviewed open-source segmentation, clarifying that Starter is a hosted free version capped at three users, while self-hosted open source supports unlimited users but only one project at a time. Jake narrowed 1,591 OSS accounts to about 100 using U.S. location, employee count, website traffic, and developer activity, while removing schools, misclassified companies, and active customers and retaining churned accounts for re-engagement. The Card opportunity, involving a company with about 68 employees and a quoted value of 20k, was progressing through a trial but still required leadership review. HubSpot stage, amount, MEDDPICC fields, AI-generated entries, and missing Slack activity required validation. A mutual action plan was needed for legal, security, procurement, signature, and payment steps. Follow-ups included confirming outreach scope with Ryan, investigating hosted-free account identification, reviewing the discovery guide, and meeting on December 8.\n\n## Keywords\nOpen-source segmentation, Free-tier conversion, Pro-to-Enterprise campaign, MEDDPICC, Mutual action plan, Pipeline development\n\n## Action Items\n**Jake Stangl**\nIdentify GrowthBook-hosted free accounts (06:29)\nVerify user limit and enforcement approach (06:37)\nConfirm employee-count targeting criteria (10:06)\nReview OSS account list (12:37)\nAdd qualified OSS accounts to outreach sequences (13:25)\nReview churned and opportunity records (14:03)\nContact Oracle connections (17:23)\nRevisit discovery call script (18:01)\nUpdate Card opportunity MEDDPIC fields (20:41)\nUse customer calls to populate Card MEDDPIC information (21:03)\nUpdate deal records weekly (23:20)\nCorrect Card opportunity stage (24:26)\nAdd quoted amount to Card opportunity record (24:34)\nAdd next step to Card opportunity (25:52)\nCreate mutual action plan for Card opportunity (27:24)\n\n**Brent Holloway**\nReview Jake’s discovery call guide (18:59)\nFollow up with Jake (19:26)",
       "organizer": "jake.stangl@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

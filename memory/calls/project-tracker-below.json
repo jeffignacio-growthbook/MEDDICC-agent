@@ -1,7 +1,7 @@
 {
   "company": "project tracker below",
   "slug": "project-tracker-below",
-  "last_etl_date": "2026-11-12T07:51:48.372471",
+  "last_etl_date": "2026-11-26T09:01:12.522930",
   "calls": [
     {
       "id": "01KG8F03200YR3AA1KR16FG4KR",
@@ -322,6 +322,17 @@
       "date": "2026-11-11",
       "duration_minutes": 24.290000915527344,
       "summary": "# Graham <> Brent GTM weekly meeting (project tracker below)\nDate: 2026-11-11 | Duration: 24.290000915527344m\n\n## Summary\nNo summary available",
+      "organizer": "graham@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M85MGCTDBHQYZSXKJ84HV4B6",
+      "source": "fireflies",
+      "title": "Graham <> Brent GTM weekly meeting (project tracker below)",
+      "date": "2026-11-25",
+      "duration_minutes": 42.16999816894531,
+      "summary": "# Graham <> Brent GTM weekly meeting (project tracker below)\nDate: 2026-11-25 | Duration: 42.16999816894531m\n\n## Summary\nThe company confirmed an AI-market focus, with AEO, AI infrastructure, product intelligence, and continuous self-improvement as key positioning themes. The growth model examined the hiring required to double year over year, including two hires by January, six in Q1, and six in Q2. Sales planning used a $1.2 million quota per rep; a $1.5 million scenario added roughly $4 million in capacity but increased execution and accelerator risk. The team advanced free hosted feature flagging to challenge LaunchDarkly, while recognizing that expansion into paid A/B testing requires better telemetry and that monetization remains underdeveloped. The Anthropic forecast reached approximately $2.5 million to $2.75 million, including an $810,000 base, with potential payments of roughly $4 million over eight or nine months and continued buy-versus-build risk. Recruiting remained important, including BDR coverage, a PLG candidate from PostHog, and European go-to-market or solution-engineering talent.\n\n## Keywords\nAI infrastructure, AEO, Sales capacity planning, Token monetisation, Feature flagging, PLG recruiting\n\n## Action Items\n**Brent Holloway**\nEvaluate Darcy Lackman fit (34:01)\nProvide Graham access to sales and hiring tracker (34:53)\nRefine headcount and ramp model (37:21)\nContinue recruiting support (37:21)\n\n**Graham McNicoll**\nAdvance free feature-flagging plan (17:58)\nEvaluate Darcy Lackman fit (34:01)\nReview hiring model (34:53)",
       "organizer": "graham@growthbook.io",
       "participants": 2,
       "summary_quality": "good"

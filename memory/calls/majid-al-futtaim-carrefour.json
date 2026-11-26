@@ -1,7 +1,7 @@
 {
   "company": "Majid Al Futtaim/Carrefour",
   "slug": "majid-al-futtaim-carrefour",
-  "last_etl_date": "2026-11-21T07:50:19.801755",
+  "last_etl_date": "2026-11-26T09:01:12.532717",
   "calls": [
     {
       "id": "01M7SQJJ9T86WKNT96W040QAJF",
@@ -11,6 +11,17 @@
       "duration_minutes": 48.540000915527344,
       "summary": "# Majid Al Futtaim/Carrefour & GrowthBook | Platform Walkthrough\nDate: 2026-11-20 | Duration: 48.540000915527344m\n\n## Summary\nThe discussion focused on expanding experimentation with GrowthBook, which is currently managed by Engineering without a formal process and with limited creative testing. The Growth team wants creator and editor access to reduce administrative dependency, while the app remains the priority because it generates over 90% of revenue. The target is 25–30 experiments annually, beginning with three users. Enterprise capabilities discussed included the Visual Editor for no-code copy and layout testing, templates for standardized workflows, expanded AI usage, and safe rollouts with approval workflows and automatic kill switches. Training, team support, APAC coverage, and possible agency assistance were requested, with regional coverage preferred. Competitors including Optimizely and Wingify were evaluated, with disclosed three-year totals of €400,000–€650,000. GrowthBook’s single-license, non-usage-based pricing was viewed as relevant. VP approval is pending, and leadership materials must compare Community and Enterprise options. GrowthBook is expected to provide a three-user quote and supporting materials before the Wednesday follow-up.\n\n## Keywords\nGrowthBook Enterprise, Visual Editor, A/B testing, Safe rollout, Experimentation programme, Agency support\n\n## Action Items\n**Tom Kassis and Sakshi**\nAnswer follow-up questions (04:41)\n\n**James Shannon**\nSend Enterprise quotation (39:09)\nContact agency partners (39:44)\nArrange agency meeting (39:44)\nSchedule Wednesday meeting (42:35)\nPrepare Enterprise comparison (46:18)\n\n**Rémy Marin**\nSend demonstration video (42:47)\nSend role information (42:47)",
       "organizer": "marcel@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7W7CWH0RBD3R9XMP00FSXP2",
+      "source": "fireflies",
+      "title": "Majid Al Futtaim/Carrefour & GrowthBook",
+      "date": "2026-11-25",
+      "duration_minutes": 29.3799991607666,
+      "summary": "# Majid Al Futtaim/Carrefour & GrowthBook\nDate: 2026-11-25 | Duration: 29.3799991607666m\n\n## Summary\nGrowthBook positioned Enterprise as an experimentation platform offering broader testing, engineering, security, training, and ROI capabilities beyond the free version. Proposed benefits included a visual editor for no-code web experiments, statistical methods for faster decisions with less traffic, sticky bucketing, monitored rollouts, automatic rollback, SSO, SLAs, audit trails, approval flows, and holdouts for measuring impact. The standard €100,000 annual license was discounted to €70,000 with five seats included, subject to near-term signing, while the customer considered mid-January more realistic because of UAE holidays, leadership availability, and a procurement process that could take about one month. The proposed managed CRO program included 36 annual tests—30 app and 6 web—for €17,000 monthly, with research, development, QA, publishing, and post-test analysis. Engineer and agency access requirements remained unresolved. The customer requested case studies and references before leadership review, and a December 9 follow-up was scheduled.\n\n## Keywords\nGrowthBook Enterprise, CRO agency, A/B testing, Safe rollouts, Procurement process, Experimentation ROI\n\n## Action Items\n**Sakshi**\nConfirm engineer access count (21:33)\nPresent Enterprise proposal (26:16)\n\n**Tom Kassis**\nConfirm engineer access count (21:48)\nPresent Enterprise proposal (26:16)\nShare purchase decision (26:46)\n\n**James Shannon**\nSend case-study deck (25:26)\nArrange follow-up meeting (27:15)",
+      "organizer": "james.shannon@growthbook.io",
       "participants": 5,
       "summary_quality": "good"
     }

@@ -1,7 +1,7 @@
 {
   "company": "Growthbook",
   "slug": "growthbook",
-  "last_etl_date": "2026-11-24T10:33:16.308706",
+  "last_etl_date": "2026-11-26T09:01:12.530739",
   "calls": [
     {
       "id": "01KGHY46Z2XRQ494JJYXYSJ57B",
@@ -286,6 +286,17 @@
       "summary": "# Growthbook - A/B test sync\nDate: 2026-11-23 | Duration: 25.75m\n\n## Summary\nThe team reviewed a GrowthBook experiment designed to test whether updated hero-banner content increases clicks to the Hero page. The new site, launched in early June, had improved time on page, engaged visitors, menu use, and relevant-page visits, but hero-banner engagement remained below expectations after “Portfolio” content was replaced by “What drives us” during the June brand sprint. The experiment uses 50% control and 50% variation, with an initial 20% rollout and phased expansion. BigQuery supplies experiment metrics using standard Google Analytics definitions, while CTA tracking remains in GTM and Google Analytics rather than being sent directly to GrowthBook. A/A validation was considered complete, but the experiment remained in draft pending review of a GrowthBook soft warning, Simon’s sign-off, and ending the existing experiment. Phillip is expected to join the GrowthBook channel to support analytics and front-end tracking.\n\n## Keywords\nGrowthBook, A/B testing, Hero-banner optimisation, Google Analytics, BigQuery, Feature flags\n\n## Action Items\n**Erik B**\nMove hero-banner experiment (17:18)\nConfigure experiment exposure (17:18)\nObtain Simon's sign-off (19:28)\nEnd A/A test (20:18)\nStart hero-banner experiment (17:18)\nHold follow-up discussion with Phillip (21:07)\n\n**Chris Sanders**\nInvestigate GrowthBook warning banner (18:23)\nInvite Phillip to GrowthBook channel (19:28)",
       "organizer": "chris@growthbook.io",
       "participants": 6,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7T48ZM6DD4BW61CC0RGKFN3",
+      "source": "fireflies",
+      "title": "Growthbook - Offline test set up",
+      "date": "2026-11-25",
+      "duration_minutes": 65.94999694824219,
+      "summary": "# Growthbook - Offline test set up\nDate: 2026-11-25 | Duration: 65.94999694824219m\n\n## Summary\nThe discussion covered configuring experiment data using MC Visit ID, exposure records, order facts, revenue fields, device type, and market dimensions. A conversion-rate metric was created for exposed users with orders, and revenue per visitor was configured using order revenue and an exposed-user denominator. Historical experiment 1540, a gallery calendar-size test, was imported with dates from October 28 to November 5 and a 50/50 control-variant split. Validation showed GrowthBook conversion rates near 21% for control and 20% for variant, with revenue results broadly aligned with existing dashboards. Chance-to-win results differed slightly, with GrowthBook showing 8.3 and the existing dashboard 7.8, partly linked to date differences. Device and market slicing was demonstrated, Bayesian analysis was retained, and broader historical data expansion is planned. Adobe and S3 exposure routes remain under discussion. Daniel, Rémy, and technical participants will support hands-on GrowthBook testing, while AI features are available through settings.\n\n## Keywords\nGrowthBook, Historical A/B testing, Snowflake data integration, Experiment exposure events, Conversion rate metrics, Bayesian experimentation\n\n## Action Items\n**Adam Borlase**\nRemove CRO 1540 filter (31:39)\nExpand historical dataset (01:00:40)\nCompare GrowthBook results (01:00:40)\n\n**Rémy Marin**\nInvestigate unknown dimensions (39:38)\nCheck support configuration (48:46)\nShare pricing use-case information (01:03:30)\n\n**Jacco Sijnesael**\nTest historical experiments (01:01:19)\nReview experiment results (01:01:19)",
+      "organizer": "remy@growthbook.io",
+      "participants": 10,
       "summary_quality": "good"
     }
   ]

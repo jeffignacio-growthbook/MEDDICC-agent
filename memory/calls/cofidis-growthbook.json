@@ -1,0 +1,18 @@
+{
+  "company": "Cofidis & GrowthBook",
+  "slug": "cofidis-growthbook",
+  "last_etl_date": "2026-11-26T09:01:12.525726",
+  "calls": [
+    {
+      "id": "01M84F14WG4RCF1R96H2XV81BC",
+      "source": "fireflies",
+      "title": "Cofidis & GrowthBook | Introduction Call",
+      "date": "2026-11-25",
+      "duration_minutes": 46,
+      "summary": "# Cofidis & GrowthBook | Introduction Call\nDate: 2026-11-25 | Duration: 46m\n\n## Summary\nThe discussion covered two active enterprise opportunities: Ramifier, a Paris fintech banking company associated with a €70,000 proposal, and Temple Webster, where win potential exists but pricing remains under competitive negotiation. Budget was not the primary issue for Ramifier, while pricing strategy is being recalibrated to avoid aggressive €200,000–€300,000 proposals as confidence in GrowthBook develops. Regulated customers, including an insurance company, require self-hosting so data remains within their infrastructure, although cloud and hosted options were also discussed. GrowthBook’s architecture separates the control, data, and event planes, and supports read-only warehouse access. Existing warehouse data would connect directly rather than follow a traditional migration model, with BigQuery and Piano Analytics discussed as integration areas. Product use cases include experimentation, feature analysis, mobile applications, and web applications. Documentation was viewed positively, but implementation details and MCP usage still require validation.\n\n## Keywords\nGrowthBook, Self-hosting, Data warehouse, Experimentation, Feature flags, Piano Analytics\n\n## Action Items\n**Unassigned**\n- Verify implementation approach (03:04)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

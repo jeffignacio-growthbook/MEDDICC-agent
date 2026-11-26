@@ -1,0 +1,18 @@
+{
+  "company": "GrowthBook & Boozt",
+  "slug": "growthbook-boozt",
+  "last_etl_date": "2026-11-26T09:01:12.525819",
+  "calls": [
+    {
+      "id": "01M7ZK53RVWB5E2NYYFEN8CNSX",
+      "source": "fireflies",
+      "title": "GrowthBook & Boozt",
+      "date": "2026-11-25",
+      "duration_minutes": 45.18000030517578,
+      "summary": "# GrowthBook & Boozt\nDate: 2026-11-25 | Duration: 45.18000030517578m\n\n## Summary\nBoozt is evaluating GrowthBook because discrepancies between VWO, Google Analytics, and BigQuery have reduced confidence in experiment conclusions, while the VWO contract renewal approaches at the beginning of February. Boozt wants BigQuery to remain the controlled source of truth, with visible SQL for validating metric calculations and experiment results. Initial scope is desktop and mobile web testing; replacing Firebase for app experimentation remains undecided and requires engineering input. Product teams need easier non-developer workflows, including a Visual Editor for copy, banners, and marketing materials, while deeper feature experiments will require GrowthBook’s core UI and engineering support. GrowthBook demonstrated targeting, traffic allocation, metric segmentation, design-system alignment, session replays, and AI-supported workflows, but it does not provide heat maps or a direct Mouseflow dashboard integration. Boozt requested enterprise pricing, support and SLA details, and comparison of seat-based and experiment-based pricing. A follow-up demo will involve engineering or data science to review SDK, BigQuery costs, and statistical questions.\n\n## Keywords\nGrowthBook, BigQuery, VWO, Experimentation, Visual Editor, Warehouse-native analytics\n\n## Action Items\n**James Shannon**\nSend Boozt experimentation case study (31:12)\nSend Boozt information overview (42:09)\nProvide Boozt commercial options (43:29)\nStart Boozt email thread (43:29)\n\n**Thomas and Nadiia**\nProvide GrowthBook user requirements (42:26)\nConfirm next demo stakeholders (43:07)\nDefine next demo goals (43:15)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

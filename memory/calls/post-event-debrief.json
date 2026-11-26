@@ -1,0 +1,18 @@
+{
+  "company": "Post-Event Debrief",
+  "slug": "post-event-debrief",
+  "last_etl_date": "2026-11-26T09:01:12.525517",
+  "calls": [
+    {
+      "id": "01M7RM1QQ7396VBXEV5CZ1DRRC",
+      "source": "fireflies",
+      "title": "Post-Event Debrief - Conversion Hotel",
+      "date": "2026-11-25",
+      "duration_minutes": 35,
+      "summary": "# Post-Event Debrief - Conversion Hotel\nDate: 2026-11-25 | Duration: 35m\n\n## Summary\nGrowthBook gained strong brand visibility and was perceived as more distinctive than Optimizely, Wingify, and Statsig, helped by Graham McNicoll’s transparent, feature-light presentation. However, the audience was dominated by CRO agencies and experimentation practitioners, with few companies matching GrowthBook’s preferred customer profile. Potential opportunities included John Lewis, Breeze Airlines through Merit, Canunu, and Booking.com, where an aging internal experimentation platform may create an opening for reporting or modular components. The event was considered worthwhile for one-time exposure, but repeating the sponsorship was not supported unless the organizer broadens the audience and attracts more relevant companies. Organizers handled logistics well, although the weekend format and event culture created participation friction. Code at MIT was identified for evaluation because of its technical audience and thought-leadership potential. James Shannon and Graham McNicoll planned Booking.com outreach beginning with a knowledge share.\n\n## Keywords\nConversion Hotel, Event sponsorship, Brand visibility, CRO agencies, Code at MIT, Booking.com platform\n\n## Action Items\n**James Shannon**\nReview event contact list (19:19)\nPrepare follow-up messages (24:23)\nIdentify Booking.com contacts (25:01)\n\n**Liz Fox**\nShare event debrief (19:33)\nAdd Code at MIT to event planning list (21:13)\n\n**Ashley Stirrup**\nProvide feedback to Tom (19:55)\n\n**Graham McNicoll**\nContact Mel at Booking.com (24:05)",
+      "organizer": "lyndsie@growthbook.io",
+      "participants": 5,
+      "summary_quality": "good"
+    }
+  ]
+}

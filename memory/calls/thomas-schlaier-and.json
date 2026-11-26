@@ -1,7 +1,7 @@
 {
   "company": "Thomas Schlaier and",
   "slug": "thomas-schlaier-and",
-  "last_etl_date": "2026-08-05T15:57:31.335708",
+  "last_etl_date": "2026-11-26T09:01:12.532054",
   "calls": [
     {
       "id": "01KXN5CSZQJ00RNTC072NX0DP7",
@@ -13,7 +13,19 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "keywords": "GrowthBook, implementation, headless CMS, dynamic paywalls, AB testing, Enterprise plan",
-      "action_items": "\n**James Shannon**\nSend email detailing differences between PRO and Enterprise plans with focus on features and support (26:35)\nProvide two pricing options: full Enterprise annual plan and one-time implementation support, both with end of July signing deadline (26:35)\nFollow up with GrowthBook support lead Natasha Lee regarding ongoing discussion and questions from NPG (26:14)\n\n**Maxie**\nConfirm exact current GrowthBook subscription plan and seat usage internally (22:19)\n\n**Thomas Schlaier**\nCoordinate internal review of GrowthBook support requirements and ensure availability of development resources for upcoming implementation (08:57)\n"
+      "action_items": "\n**James Shannon**\nSend email detailing differences between PRO and Enterprise plans with focus on features and support (26:35)\nProvide two pricing options: full Enterprise annual plan and one-time implementation support, both with end of July signing deadline (26:35)\nFollow up with GrowthBook support lead Natasha Lee regarding ongoing discussion and questions from NPG (26:14)\n\n**Maxie**\nConfirm exact current GrowthBook subscription plan and seat usage internally (22:19)\n\n**Thomas Schlaier**\nCoordinate internal review of GrowthBook support requirements and ensure availability of development resources for upcoming implementation (08:57)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7QRTCSE3VHQT5HACJMNT52P",
+      "source": "fireflies",
+      "title": "Thomas Schlaier and James Shannon",
+      "date": "2026-11-25",
+      "duration_minutes": 26.219999313354492,
+      "summary": "# Thomas Schlaier and James Shannon\nDate: 2026-11-25 | Duration: 26.219999313354492m\n\n## Summary\nGrowthBook’s interface and structure remain a positive fit, and teaser-module A/B testing in Living Docs worked, but paywall and rec wall implementation is unresolved. A fresh evaluation is comparing GrowthBook with other vendors, focusing on technical integration across a headless Living Docs CMS, six front ends, BigQuery, Statamic, SDKs, and targeting based on user and content attributes. A prior integration attempt failed because development, data science, and third-party front-end teams encountered invalid data, unexplained errors, and unclear expected behavior. A two-to-four-week technical POC will test data delivery, targeting, reliability, timeouts, and expected behavior before an annual commitment. Enterprise support would include hands-on assistance with SDKs, warehouse integration, and attributes, supported through Slack or Teams and weekly calls. The proposed commercial structure is a one-year enterprise contract at $30,000 plus $750 per seat, with five seats initially planned and no extra usage charges.\n\n## Keywords\nDynamic paywalls, A/B testing, GrowthBook Enterprise, Google BigQuery, Headless CMS, Proof of concept\n\n## Action Items\n**Thomas Schlaier**\n- Send architecture diagram (20:24)\n- Provide implementation summary (21:18)\n\n**Rémy Marin**\n- Review proof-of-concept definition (23:23)\n\n**James Shannon**\n- Send Enterprise pricing information (24:27)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
     }
   ]
 }

@@ -1,0 +1,18 @@
+{
+  "company": "Mantaa & GrowthBook",
+  "slug": "mantaa-growthbook",
+  "last_etl_date": "2026-11-26T09:01:12.531725",
+  "calls": [
+    {
+      "id": "01M7T48ZMRVM6F8Y6JWSX77Z7C",
+      "source": "fireflies",
+      "title": "Mantaa & GrowthBook | Platform Demo",
+      "date": "2026-11-25",
+      "duration_minutes": 52.43000030517578,
+      "summary": "# Mantaa & GrowthBook | Platform Demo\nDate: 2026-11-25 | Duration: 52.43000030517578m\n\n## Summary\nA recently joined UX/UI designer, two months into the company and responsible for experimentation, is evaluating the company’s first A/B testing platform. The goal is to replace subjective design decisions with evidence for launches and restylings. One PrestaShop ecommerce site spans 11 domains and requires unified experiments, shared data collection, and content in 11 languages. Because the web team is often busy, self-service experimentation is preferred, while developers should retain control of functional logic and cart-related safeguards. Important tracking includes purchases, cart additions, configurator steps, input fields, clicks, and other interaction points. The platform capabilities discussed include feature flags, audience and environment targeting, multi-variant experiments, configurable traffic splits, bandits, and country- and device-level analysis. A visual editor can support URL- and audience-targeted presentation changes, including styling, CSS, JavaScript, and Figma imports, while functional behavior requires code. BigQuery can connect exposure events with business data, and additional metrics can be applied retroactively. The team plans to compare platforms this week, select a shortlist next week, and hold a tentative Thursday 11 a.m. follow-up.\n\n## Keywords\nA/B testing, Feature flags, Visual Editor, BigQuery analytics, E-commerce experimentation, Contextual bandits\n\n## Action Items\n**Aristea Klanac**\nComplete platform comparison (48:08)\nConfirm follow-up meeting (50:13)\n\n**Marcel Geldner**\nPrepare proof-of-concept discussion (49:00)\nSend placeholder invitation (50:13)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}

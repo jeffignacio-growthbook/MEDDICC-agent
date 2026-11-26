@@ -1,0 +1,18 @@
+{
+  "company": "Scaling Experimentation with",
+  "slug": "scaling-experimentation-with",
+  "last_etl_date": "2026-11-26T09:01:12.525383",
+  "calls": [
+    {
+      "id": "01M89WB4WBCYRE3V5QPPT6SVRV",
+      "source": "fireflies",
+      "title": "Scaling Experimentation with Self-Service Metrics",
+      "date": "2026-11-25",
+      "duration_minutes": 35.560001373291016,
+      "summary": "# Scaling Experimentation with Self-Service Metrics\nDate: 2026-11-25 | Duration: 35.560001373291016m\n\n## Summary\nThe discussion focused on improving an experimentation process currently limited by manual, engineering-led testing, feature-flag work, cross-functional dependencies, and limited visibility. Data engineers define metrics, engineers assess feasibility, and weekly coordination contributes to a capacity of three monthly tests versus a target of twenty, while ideas accumulate in a backlog. Self-service experimentation aims to reuse recurring metrics, reduce data-team requests, and increase engineering independence. Optimization centers on revenue per user, platform time spent, website actions, and bets, while Microsoft BI dashboards create interpretation challenges. A proposed governance model lets PMs define metrics, keeps data-team validation, and creates reusable official metrics. GrowthBook supports warehouse-native A/B testing, multi-arm bandits, audience targeting, Bayesian results, goal and secondary metrics, and guardrails. AI capabilities include MCP-assisted experiment creation, metric definitions, analysis, and idea generation. Product analytics and improved discovery-led demos were also discussed.\n\n## Keywords\nExperimentation, Feature flags, Warehouse-native analytics, A/B testing, AI experiment workflows, Product metrics\n\n## Action Items\n**Rémy Marin**\nBegin discovery questions (30:45)\nConnect capabilities to pain points (31:18)\nAsk capability value (31:18)\nAsk capability resolution (31:18)\nRecord practice demo (32:31)\nReconnect with Logan (33:50)",
+      "organizer": "remy@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

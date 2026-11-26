@@ -1,0 +1,18 @@
+{
+  "company": "Signals sync",
+  "slug": "signals-sync",
+  "last_etl_date": "2026-11-26T09:01:12.524767",
+  "calls": [
+    {
+      "id": "01M89WEHM825711JC7TCWXC4Z3",
+      "source": "fireflies",
+      "title": "Signals sync",
+      "date": "2026-11-25",
+      "duration_minutes": 72.16999816894531,
+      "summary": "# Signals sync\nDate: 2026-11-25 | Duration: 72.16999816894531m\n\n## Summary\nThe team is designing an experiment-signals pipeline that produces concise, high-value findings from precomputed dimension breakdowns, while avoiding noisy or misleading alerts. Signal-selection rules, output contracts, estimators, ranking, filtering, cross-slice multiple-comparison correction, and hard-cap handling remain unresolved. Incremental updates are prioritized initially, although computing signals after full DAG completion was viewed as simpler. PR 7773 provides the foundation for Agenda job state management and experiment-update DAG execution, but experiment updates do not yet run through it and the team must confirm whether non-query signal processing fits the current DAG. Signals will initially cover goal and guardrail metrics, appear in the redesigned results UI, and be added to the public results API. Luke owns signal logic and is advancing PR 7773; Lillia is starting UI work with mocked data; Michael continues dimension configuration; Gabe’s design is the working UI reference. December 10 is the absolute delivery deadline.\n\n## Keywords\nSignal computation, Multiple-comparisons correction, DAG orchestration, Dimension breakdowns, Results UI, Agent-friendly API\n\n## Action Items\n**Lillia Jackson**\nBranch UI implementation from PR 7773 (45:31)\nImplement redesigned results-table UI (01:00:50)\nReconnect with team (01:10:11)\n\n**Luke Sonnet**\nDefine statistical signal criteria (48:46)\nPrepare results-table UI handoff (01:02:17)\nShare signal workflow context (01:04:16)\nAdvance PR 7773 (01:09:58)\n\n**Michael Samper**\nComplete experiment-dimension configuration plan (01:10:24)",
+      "organizer": "lillia@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

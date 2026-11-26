@@ -1,7 +1,7 @@
 {
   "company": "Sales call with",
   "slug": "sales-call-with",
-  "last_etl_date": "2026-11-19T08:09:43.864791",
+  "last_etl_date": "2026-11-26T09:01:12.532382",
   "calls": [
     {
       "id": "01M7FYAQXKSVHRGVKTKA7RWQD6",
@@ -23,6 +23,17 @@
       "summary": "# Sales call with Jeffrey Post from Market Leader\nDate: 2026-11-18 | Duration: 44.766666412353516m\n\n## Summary\nThe discussion explored using GrowthBook to improve ROI and conversion performance on sales-driven landing pages, since no dedicated A/B testing tool is currently in place. Market Leader, SmartZip, and one unresolved third brand were identified for potential testing through separate GrowthBook projects. Jeffrey is expected to handle most test setup and interface work, but engineering support may be needed for SDK configuration, code changes, and integrations. Each site will likely require its own GA4 connection and corresponding data source, with metrics such as average order value, bounce rate, and click-through rate available for analysis. Market Leader uses Pardot landing pages and SmartZip uses ColdFusion, creating implementation considerations. Pardot compatibility requires validation because GrowthBook has no direct integration, while the visual editor may cause flicker. The proposed evaluation is to connect one site on the free platform, test the integration and workflow, and then consider expansion. The Pro plan includes three projects, 30 users, unlimited experiments and traffic, and two million monthly events; three seats were estimated at approximately $1,440 annually.\n\n## Keywords\nGrowthBook, A/B testing, GA4 integration, Pardot, Experimentation platform, Landing-page optimisation\n\n## Action Items\n**Dan Wathne**\nConfirm GrowthBook Pardot configuration (03:28)",
       "organizer": "dan@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M7SX93F0J3T586Z6GDXJZAM5",
+      "source": "fireflies",
+      "title": "Sales call with Aurelien Deleusiere from Webellian",
+      "date": "2026-11-25",
+      "duration_minutes": 32.33000183105469,
+      "summary": "# Sales call with Aurelien Deleusiere from Webellian\nDate: 2026-11-25 | Duration: 32.33000183105469m\n\n## Summary\nWebellian, a 150-person Warsaw-based engineering firm focused on travel, was identified as a potential GrowthBook partner with worldwide opportunities involving companies such as Expedia, Airbnb, Visa, Flight Centre, and American Express. Webellian requested GrowthBook training and could evangelize the product, while its existing Strapi experience was noted. A travel CEO’s feature request has accelerated the timeline, with an enterprise evaluation and competing solution under consideration. The demonstrated POC covered travel-parameter configuration, gold/silver/bronze offers, ordering variants, and best-value labeling. A one-month POC was proposed, including experiment setup, a readout, and parallel business-case development, with support from Rémy, the solution engineer, and potentially the product team. Required integrations include agent portals, websites, mobile applications, booking widgets, and backend APIs. Current feature-flag usage is mainly technical, while the desired improvement is behavioral measurement with stronger business ownership. Enterprise pricing is needed for Tuesday, using a platform fee plus per-seat pricing that includes analytics and experimentation. Security concerns relate to insurance compliance and recent industry breaches. A mid-December demo, mid-January executive presentation, NDA exchange, pricing materials, and a shared Slack channel were planned.\n\n## Keywords\nGrowthBook, Experimentation, Travel insurance, Feature flagging, Enterprise pricing, MCP integration\n\n## Action Items\n**GrowthBook Team**\nSupport proof of concept (11:13)\n\n**Marcel Geldner**\nProvide security information (10:03)\nPrepare pricing model (16:30)\nSend NDA documentation (27:14)\nInclude Rémy in email thread (27:36)\nSet up Slack channel (28:05)\n\n**Aurélien Deleusière**\nRefine proof-of-concept scope (16:00)\nDiscuss pricing with CEO (16:30)\nMaintain pricing confidentiality (26:19)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
       "summary_quality": "good"
     }
   ]
