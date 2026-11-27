@@ -1,0 +1,18 @@
+{
+  "company": "BSQ Group &",
+  "slug": "bsq-group",
+  "last_etl_date": "2026-11-27T09:15:48.968465",
+  "calls": [
+    {
+      "id": "01M86XSEZ0908Q9844MC3GXYET",
+      "source": "fireflies",
+      "title": "BSQ Group & GrowthBook | Use cases Demo + Next Steps",
+      "date": "2026-11-26",
+      "duration_minutes": 68,
+      "summary": "# BSQ Group & GrowthBook | Use cases Demo + Next Steps\nDate: 2026-11-26 | Duration: 68m\n\n## Summary\nThe discussion outlined an experimentation strategy for a company without an existing experimentation program, drawing on prior experience with Optimizely, Adobe Target, and proprietary platforms. The recommended starting point is one or two simple tests to validate data flow and functionality, followed by an ambition of approximately 40–50 annual tests shared across First Formations, Rapid Formations, and Quantif Formations. Measurement must cover homepage-to-checkout movement, clicks, scrolling, application starts and completions, and later purchases of additional services. GA4 events already feed a BigQuery warehouse, but click and scroll tracking require improvement. Server-side implementation was preferred for the Next.js environment to reduce flicker, while mutually exclusive experiments require technical follow-up. Warehouse-native reporting, exposure events, Bayesian and frequentist analysis, CUPED, cumulative conversion trends, seasonality visibility, and an experiment learnings library were important requirements. Personalization can use UTM parameters and anonymous or account IDs. Rémy will investigate cumulative-report feasibility, and Dan requested confirmation.\n\n## Keywords\nExperimentation platform, GrowthBook, Warehouse-native analytics, A/B testing, Cumulative conversion reporting, Personalisation\n\n## Action Items\n**Rémy Marin**\nInvestigate GrowthBook reporting (26:53)\n\n**Dan Deshapriya**\nSend cumulative conversion example (27:03)\nContact Marcel about next steps (58:13)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

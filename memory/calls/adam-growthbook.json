@@ -1,0 +1,18 @@
+{
+  "company": "Adam + GrowthBook",
+  "slug": "adam-growthbook",
+  "last_etl_date": "2026-11-27T09:15:48.968304",
+  "calls": [
+    {
+      "id": "01M86XSEYFYJ2JQXB5XSER669G",
+      "source": "fireflies",
+      "title": "Adam + GrowthBook",
+      "date": "2026-11-26",
+      "duration_minutes": 25.670000076293945,
+      "summary": "# Adam + GrowthBook\nDate: 2026-11-26 | Duration: 25.670000076293945m\n\n## Summary\nThe discussion framed experimentation as continuous learning, noting that only 1 in 3 product changes typically improves the product and that failed tests should inform future decisions (00:43). Teams are expected to use shared data, measure short-term experiment outcomes and longer-term metric trends, and access agreed metrics beyond CRO or administrator functions (01:57–02:33). Storio’s data maturity remains low but is improving: Snowflake now includes initial traffic and conversion-rate definitions, while revenue per visitor provides a usable starting metric (05:12–06:18). GrowthBook could improve visibility, automate analysis, surface issues such as sample ratio mismatch, standardize setup through templates, and support train-the-trainer enablement for data, product, engineering, and administrator teams (04:31–09:01). Product teams are expected to move toward hypothesis-led testing with feature flags, monitoring, and explicit winner-or-loser decisions (10:05–11:46). Future capabilities include searchable learnings, multi-arm bandits, and interleaving experiments (14:50–18:01). Historical experiments may provide useful context, but priority remains live A/B testing after completing the AA flow (20:33–23:27).\n\n## Keywords\nExperimentation culture, GrowthBook, Metric definitions, Snowflake semantic layer, Feature flags, Shared learnings\n\n## Action Items\n**James Shannon**\n- Share recording (00:00)\n- Propose follow-up next steps (23:42)\n\n**Rémy Marin**\n- Verify imported experiments (22:36)\n- Discuss AI feature with Shaz (22:57)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    }
+  ]
+}

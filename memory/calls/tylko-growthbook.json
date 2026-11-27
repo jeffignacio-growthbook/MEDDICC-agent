@@ -1,0 +1,18 @@
+{
+  "company": "Tylko & GrowthBook",
+  "slug": "tylko-growthbook",
+  "last_etl_date": "2026-11-27T09:15:48.968582",
+  "calls": [
+    {
+      "id": "01M86J9JFT4F0X65V6Y5XG4PSY",
+      "source": "fireflies",
+      "title": "Tylko & GrowthBook | Potential Scenarios for GB Setup",
+      "date": "2026-11-26",
+      "duration_minutes": 42.09000015258789,
+      "summary": "# Tylko & GrowthBook | Potential Scenarios for GB Setup\nDate: 2026-11-26 | Duration: 42.09000015258789m\n\n## Summary\nThe discussion focused on using GrowthBook for e-commerce experimentation while moving from a legacy monolith to commercetools and a composable architecture within months. Existing testing limitations included weak experiment separation, manual randomization, and limited parallel experiments, supporting a build-versus-buy preference with platform support. A phased migration test would keep existing sessions on the legacy platform while routing 10–20% of new sessions to the new experience, initially using a smaller-country pilot with half of new sessions on each platform. Measurement is complicated by two-to-three-week purchase decisions, four or five iterations, and the need to use save-for-later indicators. Routing may use country, recurring-visitor status, basket or session indicators, and login history; anonymous users may lack sufficient information for reassignment. Business users prefer a UI, while CLI, API, MCP, and data-warehouse integrations support automation and analytics. GrowthBook proposed a three-to-four-week Pro trial, with December preferred if engineering resources are available and January as a fallback; Michał will coordinate engineering estimates, while organization setup and cloud or self-hosted selection remain pending.\n\n## Keywords\nGrowthBook, A/B testing, Feature flags, E-commerce replatforming, Phased rollout, Proof of concept\n\n## Action Items\n**Michał Kwiatkowski**\nAsk technology team for estimates (32:32)\nIdentify engineering capacity (38:04)\nContact GrowthBook for POC planning (40:15)\n\n**Rémy Marin**\nProvide temporary Pro-version instance (33:08)\nEnable POC licence (40:01)\n\n**Marcel Geldner**\nShare subscription and contract details (39:28)",
+      "organizer": "marcel@growthbook.io",
+      "participants": 4,
+      "summary_quality": "good"
+    }
+  ]
+}
