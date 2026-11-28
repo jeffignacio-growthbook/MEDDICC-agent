@@ -1,0 +1,18 @@
+{
+  "company": "Storio Weekly",
+  "slug": "storio-weekly",
+  "last_etl_date": "2026-11-28T08:33:39.577317",
+  "calls": [
+    {
+      "id": "01M8EK7DY89PK5XSMKXVZNSWMY",
+      "source": "fireflies",
+      "title": "Storio Weekly - Experiment Integration and Pilot Planning",
+      "date": "2026-11-27",
+      "duration_minutes": 37.029998779296875,
+      "summary": "# Storio Weekly - Experiment Integration and Pilot Planning\nDate: 2026-11-27 | Duration: 37.029998779296875m\n\n## Summary\nHistorical experiment importing was completed, including assignment fact-table configuration, while a code-based experiment ID error remains scheduled for fixing and review next week. The team aims to make one or two additional experiments self-service, with Rémy available if support is needed, and proposed importing pricing experiments for AI-based analysis. Route One, using the existing Adobe pipeline, remains a fallback while Route Two develops a direct Tealium-to-Snowflake flow with GrowthBook exposure events. Front-end SDK work is blocked until the team becomes available, and data-route readiness still requires confirmation. Pilot planning requires a launch date, December work should begin before the holidays, and a commercial decision is targeted for mid-January following an early-January test. Pricing promotions remain unresolved pending Emmanuel’s input. Both Adobe and direct Snowflake exposure datasets will be compared, with conversion rate, revenue per visit, and checkout funnel metrics tracked. Browser, country, and product-category slicing are supported, while DPO guidance is needed on consent before SDK rollout.\n\n## Keywords\nGrowthBook, Historical experiment imports, Tealium–Snowflake pipeline, GrowthBook SDK, Funnel metrics, Consent management\n\n## Action Items\n**Shaaz Adiraja**\n- Correct experiment ID coding (00:32)\n- Import historical experiments (00:47)\n- Align launch date (08:38)\n- Obtain pilot scope guidance (10:31)\n- Assess Claude integration (12:28)\n- Discuss import approach (16:10)\n- Assess SDK expansion (16:27)\n- Define checkout funnel (23:18)\n- Coordinate funnel definitions (28:31)\n- Consult company DPO (33:16)\n\n**Luuk Scholten**\n- Confirm Route 2 timeline (06:43)\n- Align launch target (08:31)\n\n**Rémy Marin**\n- Offer manual experiment replication (15:44)\n- Prepare funnel metrics guide (20:48)\n- Verify metric slice implementation (25:04)\n- Send dimension guidance (25:04)",
+      "organizer": "remy@growthbook.io",
+      "participants": 1,
+      "summary_quality": "good"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "company": "Remy & James",
   "slug": "remy-james",
-  "last_etl_date": "2026-08-05T15:57:31.343293",
+  "last_etl_date": "2026-11-28T08:33:39.583274",
   "calls": [
     {
       "id": "01KXDJ8Q0MQ1EDZBCSA8SHRSE5",
@@ -13,7 +13,19 @@
       "organizer": "james.shannon@growthbook.io",
       "participants": 2,
       "keywords": "Rippling, EOR contract, labor portage model, prospecting obligations, variable remuneration, legal review",
-      "action_items": "\n**Rémy Marin**\nSend contract and related documents to James Shannon for review (03:36)\nSubmit detailed questions on Section 5.2 (prospecting and missions), variable remuneration, and contract type to Jennifer via email, cc James for transparency (14:09)\nAwait legal counsel review expected on Wednesday and convey feedback promptly for any contract amendments (06:42)\nCommunicate to Jennifer readiness to start by July 22 or 27, depending on contract finalization progress (20:12)\n\n**James Shannon**\nConfirm with Rippling and Jennifer on contract structure, especially if variable pay is in a separate document and clarify prospecting obligations (08:34)\nInform Growth Book team of meeting and next steps to ensure alignment and readiness for onboarding once contract finalized (23:01)\n"
+      "action_items": "\n**Rémy Marin**\nSend contract and related documents to James Shannon for review (03:36)\nSubmit detailed questions on Section 5.2 (prospecting and missions), variable remuneration, and contract type to Jennifer via email, cc James for transparency (14:09)\nAwait legal counsel review expected on Wednesday and convey feedback promptly for any contract amendments (06:42)\nCommunicate to Jennifer readiness to start by July 22 or 27, depending on contract finalization progress (20:12)\n\n**James Shannon**\nConfirm with Rippling and Jennifer on contract structure, especially if variable pay is in a separate document and clarify prospecting obligations (08:34)\nInform Growth Book team of meeting and next steps to ensure alignment and readiness for onboarding once contract finalized (23:01)\n",
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M86XSEZ0XXZT0A5XWWH73DAD",
+      "source": "fireflies",
+      "title": "Remy & James Demo Run Through",
+      "date": "2026-11-27",
+      "duration_minutes": 61.11000061035156,
+      "summary": "# Remy & James Demo Run Through\nDate: 2026-11-27 | Duration: 61.11000061035156m\n\n## Summary\nValorium Gaming evaluated GrowthBook to help product managers launch and analyze experiments independently within six months. Its current process spans four to six weeks, with data science support creating an analysis bottleneck and limiting output to approximately five to ten experiments per quarter; the goal is to double that volume. Experimentation is fragmented across homegrown and vendor tools, web, mobile, and server-side surfaces, and multiple warehouses. James Shannon emphasized consolidating analysis through BigQuery while avoiding an immediate replacement of existing feature flagging and attribution systems, making analysis-only deployment an important option. GrowthBook features that aligned with needs included program dashboards, a learnings library, automated presentations, health checks, Slack alerts, reusable metrics and dimensions, Frequentist analysis, and AI-assisted interpretation. Open questions remain around sequential testing, third-party data integration, and scaled impact positioning. The next demo should use gaming-relevant examples, provide concise objection handling, strengthen the metrics value narrative, and connect self-service, trust, and faster iteration to Valorium’s priorities.\n\n## Keywords\nExperimentation platform, Self-service product management, Frequentist analysis, BigQuery data warehouse, Experiment learnings, Experiment health monitoring\n\n## Action Items\n**Rémy Marin**\nRewrite scaled impact explanation (37:53)\nConsult Logan or Luke (46:36)\nPrepare gambling and betting demo (52:26)\nReview tail section of demo (54:17)\nExplain warehouse-based querying value (54:46)\nClarify sequential testing workflow (56:21)\nClarify experiment health checks and SRM monitoring (57:25)\nMap GrowthBook capabilities to customer pains (57:58)",
+      "organizer": "james.shannon@growthbook.io",
+      "participants": 2,
+      "summary_quality": "good"
     }
   ]
 }

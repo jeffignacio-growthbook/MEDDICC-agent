@@ -1,7 +1,7 @@
 {
-  "company": "Growthbook Meeting",
+  "company": "GrowthBook Meeting",
   "slug": "growthbook-meeting",
-  "last_etl_date": "2026-10-02T06:25:29.668742",
+  "last_etl_date": "2026-11-28T08:33:39.577048",
   "calls": [
     {
       "id": "01M3SZ5H2JHRZVTRH49H9DGAFB",
@@ -12,6 +12,17 @@
       "summary": "# Growthbook Meeting\nDate: 2026-10-01 | Duration: 10m\n\n## Summary\nNo summary available",
       "organizer": "ryan.mcgurk@growthbook.io",
       "participants": 2,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M89G92QD0HXE9P2BYFK5NT2W",
+      "source": "fireflies",
+      "title": "GrowthBook Meeting",
+      "date": "2026-11-27",
+      "duration_minutes": 11.930000305175781,
+      "summary": "# GrowthBook Meeting\nDate: 2026-11-27 | Duration: 11.930000305175781m\n\n## Summary\nNo summary available",
+      "organizer": "jake.stangl@growthbook.io",
+      "participants": 3,
       "summary_quality": "good"
     }
   ]

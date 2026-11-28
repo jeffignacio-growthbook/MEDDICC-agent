@@ -1,7 +1,7 @@
 {
   "company": "Demo Call with",
   "slug": "demo-call-with",
-  "last_etl_date": "2026-11-26T09:01:12.527907",
+  "last_etl_date": "2026-11-28T08:33:39.580234",
   "calls": [
     {
       "id": "01KVQXF41EXDVS8JGZYMQR0H74",
@@ -1400,6 +1400,17 @@
       "duration_minutes": 39,
       "summary": "# Demo Call with Vincent Teillet from Treated\nDate: 2026-11-25 | Duration: 39m\n\n## Summary\nThe discussion focused on whether to renew Optimizely and whether GrowthBook could provide a suitable, cost-effective experimentation platform. Optimizely renewal remains pending because cost is the primary concern, while limited traffic makes results harder to prove. Current experimentation is active, but personalization and server-side testing have not been used. GrowthBook supports visual editing, server-side testing, MCP access, feature flags, guardrail metrics, automatic stopping, metric insights, and funnel-stage analysis. Its warehouse-native model fits the existing BigQuery and GA4 setup, with read-only warehouse access and results returned to the warehouse. Anthropic integration is already functioning for cloud-based test suggestions. The annual package costs $20,000 for five users, unlimited traffic and experiments, onboarding, training, and dedicated Slack support. Malick will brief Vincent, create a free account, and provide the user and organization IDs. Marcel will share documentation, industry examples, and a relevant Hims case study. The team plans to test the platform for one week and review the continuation decision next Friday.\n\n## Keywords\nGrowthBook, Optimizely migration, Warehouse-native experimentation, BigQuery, Feature flags, Guardrail metrics\n\n## Action Items\n**Malick Ba**\nCreate GrowthBook account (25:55)\nSend GrowthBook IDs (25:59)\nReview GrowthBook materials (27:05)\nDebrief with Vincent Teillet (26:35)\nConfirm Treated next steps (29:13)\n\n**Marcel Geldner**\nProvide temporary platform access (26:12)\nSend GrowthBook documentation (28:01)",
       "organizer": "marcel@growthbook.io",
+      "participants": 3,
+      "summary_quality": "good"
+    },
+    {
+      "id": "01M8BYXR8KAAF0Z0M7Z9NN5MC3",
+      "source": "fireflies",
+      "title": "Demo Call with Subrahmanya Bhat from BrowserStack",
+      "date": "2026-11-27",
+      "duration_minutes": 18.15999984741211,
+      "summary": "# Demo Call with Subrahmanya Bhat from BrowserStack\nDate: 2026-11-27 | Duration: 18.15999984741211m\n\n## Summary\nBrowserStack is evaluating GrowthBook primarily to reduce the approximately $500 monthly cost of its current LaunchDarkly setup, which already meets its technical needs. The planned deployment is predominantly server-side and requires Node and Ruby SDKs, cloud deployment, high availability, caching, proxy support, and compatibility with internal infrastructure. GrowthBook supports initialization-time targeting attributes, JSON, on/off, and string flags, cached values during connection outages, proxies, Redis caching, and API-driven workflows. The Pro plan was described as $40 per user per month, with unlimited flags, three projects, 30 users, two million CDN requests, and 20GB monthly; BrowserStack expects 10 to 15 users and requested Enterprise pricing for 10 seats and 20 million monthly CDN requests. Standard environments include production, development, staging, and test, while custom environments require Enterprise. BrowserStack will test the free tier, SDK configuration, and LaunchDarkly importer, while James Shannon will provide an Enterprise quote and Redis and proxy documentation.\n\n## Keywords\nFeature flags, GrowthBook, LaunchDarkly migration, Redis caching, Proxy architecture, Enterprise pricing\n\n## Action Items\n**James Shannon**\nSend Enterprise pricing quote (14:17)\nProvide Redis documentation (16:19)\nProvide proxy architecture documentation (16:19)\n\n**Subrahmanya Bhat**\nUse free tier to test SDK configuration and attribution (16:04)\nTest LaunchDarkly importer (16:04)",
+      "organizer": "james.shannon@growthbook.io",
       "participants": 3,
       "summary_quality": "good"
     }
